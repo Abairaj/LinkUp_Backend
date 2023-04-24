@@ -35,20 +35,21 @@ class UserManager(BaseUserManager):
 
 class user(AbstractUser):
     email = models.EmailField(unique=True, blank=False)
-    username = models.CharField(max_length=250)
-    name = models.CharField(max_length=250)
+    username = models.CharField(max_length=250,unique=True)
+    full_name = models.CharField(max_length=250,blank=True)
     profile = models.ImageField(upload_to='profile',blank=True)
     gender = models.CharField(max_length=25,choices=GENDER_CHOICES)
-    phone = models.CharField(max_length=15)
+    phone = models.CharField(max_length=15,unique=True)
     bio = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField()
-    followers = models.PositiveIntegerField()
-    following = models.PositiveIntegerField()
+    followers = models.IntegerField()
+    following = models.IntegerField()
     password = models.CharField(max_length=25)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
+    
 
     REQUIRED_FIELDS = ['username']
     USERNAME_FIELD = 'email'
