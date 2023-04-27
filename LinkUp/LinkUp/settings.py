@@ -70,14 +70,14 @@ WSGI_APPLICATION = 'LinkUp.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-        'default': {
-            'ENGINE': 'djongo',
-            'NAME': 'linkup',
-            'ENFORCE_SCHEMA': False,
-            'CLIENT': {
+    'default': {
+        'ENGINE': 'djongo',
+        'NAME': 'linkup',
+        'ENFORCE_SCHEMA': False,
+        'CLIENT': {
                 'host': 'localhost:27017'
-            }  
         }
+    }
 }
 
 
@@ -135,12 +135,11 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',
     ],
 
-     'DEFAULT_AUTHENTICATION_CLASSES': (
+    'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
 
 }
-
 
 
 # simpleJWT
@@ -153,7 +152,7 @@ SIMPLE_JWT = {
     "UPDATE_LAST_LOGIN": True,
 
     "ALGORITHM": "HS256",
-    "SIGNING_KEY":SECRET_KEY,
+    "SIGNING_KEY": SECRET_KEY,
     "VERIFYING_KEY": "",
     "AUDIENCE": None,
     "ISSUER": None,

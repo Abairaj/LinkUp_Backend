@@ -3,9 +3,9 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import BaseUserManager
 
 GENDER_CHOICES = {
-    ('Male','Male'),
-    ('Female','Female'),
-    ('Transgenders','Transgenders')
+    ('Male', 'Male'),
+    ('Female', 'Female'),
+    ('Transgenders', 'Transgenders')
 }
 
 
@@ -35,21 +35,20 @@ class UserManager(BaseUserManager):
 
 class user(AbstractUser):
     email = models.EmailField(unique=True, blank=False)
-    username = models.CharField(max_length=250,unique=True)
-    full_name = models.CharField(max_length=250,blank=True)
-    profile = models.ImageField(upload_to='profile',blank=True)
-    gender = models.CharField(max_length=25,choices=GENDER_CHOICES)
-    phone = models.CharField(max_length=15,unique=True)
-    bio = models.TextField()
+    username = models.CharField(max_length=250, unique=True)
+    full_name = models.CharField(max_length=250, blank=True)
+    profile = models.ImageField(upload_to='profile', blank=True, null=True)
+    gender = models.CharField(max_length=25, choices=GENDER_CHOICES)
+    phone = models.CharField(max_length=15, unique=True)
+    bio = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    last_login = models.DateTimeField()
-    followers = models.IntegerField()
-    following = models.IntegerField()
+    last_login = models.DateTimeField(blank=True)
+    followers = models.IntegerField(default=0)
+    following = models.IntegerField(default=0)
     password = models.CharField(max_length=25)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
-    
 
     REQUIRED_FIELDS = ['username']
     USERNAME_FIELD = 'email'
