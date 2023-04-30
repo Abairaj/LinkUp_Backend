@@ -16,10 +16,6 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = user
-        fields = "__all__"
 
 
 class UserLoginSerializer(serializers.ModelSerializer):

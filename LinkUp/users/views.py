@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.permissions import AllowAny,IsAuthenticated
-from .serializers import UserRegisterSerializer, UserLoginSerializer, UserProfileSerializer,UserSerializer
+from .serializers import UserRegisterSerializer, UserLoginSerializer, UserProfileSerializer
 from django.contrib.auth import authenticate, login, logout
 from .models import user
 
@@ -61,28 +61,7 @@ class UserLoginAPIView(TokenObtainPairView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-
-class AdminLoginAPIView(TokenObtainPairView):
-    permission_classes=[AllowAny]
-
-    def post(self,request,*args,**kwargs):
-        response = super(AdminLoginAPIView,self).post(request,*args,**kwargs)
-        token = response.data.get("access")
-
-        email = request.data['email']
-        password = request.data['password']
-        serializer = UserLoginSerializer(data=request.data)
-        if serializer.is_valid():
-            User = authenticate(email=email,password=password)
-            if User is not None and User.is_superuser:
-                login(request,User)
-                return Response({'token':token,'id':User.pk},status=status.HTTP_200_OK)
-            else:
-                return Response({'error':"password or email not valid"}, status=status.HTTP_401_UNAUTHORIZED)
-
-        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         
-
 
 
 class UserProfileAPIView(APIView):
@@ -104,6 +83,7 @@ class UserProfileAPIView(APIView):
 
     def patch(self, request, pk):
         User = self.get_object(pk)
+        print(request.data)
         if User:
             serializer = UserProfileSerializer(instance=User,data=request.data,partial=True)
             if serializer.is_valid():
@@ -113,3 +93,10 @@ class UserProfileAPIView(APIView):
                 print(serializer.errors)
                 return Response({'message': 'User update Failed'}, status=status.HTTP_400_BAD_REQUEST)
         return Response({'message': 'user not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+class LogoutApiView(APIView):
+    permission_classes=[IsAuthenticated]
+    def post(self,request):
+        logout(request)
+        return Response({'message':"successfully logged out."},status=status.HTTP_200_OK)
