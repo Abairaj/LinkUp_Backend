@@ -29,12 +29,22 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'dj_rest_auth',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'dj_rest_auth.registration',
+    'rest_framework.authtoken',
+    'allauth.socialaccount.providers.facebook',
     'rest_framework_simplejwt',
     "corsheaders",
     'users',
     'socialauth',
     'custom_admin'
 ]
+SITE_ID = 1
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -45,6 +55,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+  
 ]
 
 ROOT_URLCONF = 'LinkUp.urls'
@@ -145,6 +156,14 @@ REST_FRAMEWORK = {
 }
 
 
+AUTHENTICATION_BACKENDS = (
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+)
+
+SITE_ID = 1
+
+
 # simpleJWT
 
 SIMPLE_JWT = {
@@ -192,3 +211,20 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
+
+
+
+
+SOCIALACCOUNT_PROVIDERS = {
+    'facebook': {
+        'SCOPE': ['email'],
+        'METHOD': 'oauth2',
+        'VERIFIED_EMAIL': False,
+        'VERSION': 'v10.0',
+    }
+}
+
+SOCIALACCOUNT_QUERY_EMAIL = True
+
+SOCIALACCOUNT_FACEBOOK_APP_ID = '716864823524971'
+SOCIALACCOUNT_FACEBOOK_API_SECRET = 'f2a8572ab13c0ed3056cc8e33426018f'

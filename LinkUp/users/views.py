@@ -4,20 +4,23 @@ from rest_framework.generics import CreateAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework.permissions import AllowAny,IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from .serializers import UserRegisterSerializer, UserLoginSerializer, UserProfileSerializer
 from django.contrib.auth import authenticate, login, logout
 from .models import user
-
+from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
 
 
 class AuthCheckAPIView(APIView):
-    permission_classes=[IsAuthenticated]
-    def get(self,request):
-            print("authentication checked")
-            return Response(status=status.HTTP_200_OK)
+    permission_classes = [IsAuthenticated]
 
-
+    def get(self, request,id):
+        User =user.objects.get(pk=id)
+        print("authentication checked")
+        if User.is_superuser:
+            return Response({'isAdmin':True},status=status.HTTP_200_OK)
+        else:
+            return Response({'isAdmin':False},status=status.HTTP_200_OK)
 
 
 
@@ -26,7 +29,6 @@ class UserRegistrationAPIView(APIView):
 
     def post(self, request):
         serializer = UserRegisterSerializer(data=request.data)
-       
 
         if serializer.is_valid():
             User = serializer.save()
@@ -52,16 +54,15 @@ class UserLoginAPIView(TokenObtainPairView):
 
         if serializer.is_valid():
             User = authenticate(
-                    email=email, password=password)
+                email=email, password=password)
             if User is not None:
                 login(request, User)
-                return Response({'token': token, 'id': User.pk}, status=status.HTTP_200_OK)
+                user = UserProfileSerializer(User)
+                return Response({'token': token, 'id': User.pk, 'user': user.data}, status=status.HTTP_200_OK)
             else:
-                return Response({'error':"password or email not valid"}, status=status.HTTP_401_UNAUTHORIZED)
+                return Response({'error': "password or email not valid"}, status=status.HTTP_401_UNAUTHORIZED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-        
 
 
 class UserProfileAPIView(APIView):
@@ -85,7 +86,8 @@ class UserProfileAPIView(APIView):
         User = self.get_object(pk)
         print(request.data)
         if User:
-            serializer = UserProfileSerializer(instance=User,data=request.data,partial=True)
+            serializer = UserProfileSerializer(
+                instance=User, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
                 return Response({'message': "User details updated successfully"}, status=status.HTTP_200_OK)
@@ -96,7 +98,9 @@ class UserProfileAPIView(APIView):
 
 
 class LogoutApiView(APIView):
-    permission_classes=[IsAuthenticated]
-    def post(self,request):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        print('.............................jjj')
         logout(request)
-        return Response({'message':"successfully logged out."},status=status.HTTP_200_OK)
+        return Response({'message': "successfully logged out."}, status=status.HTTP_200_OK)
