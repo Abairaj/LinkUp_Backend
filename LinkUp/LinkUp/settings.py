@@ -39,9 +39,11 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.facebook',
     'rest_framework_simplejwt',
     "corsheaders",
+    'celery',
     'users',
     'socialauth',
-    'custom_admin'
+    'custom_admin',
+    'post',
 ]
 SITE_ID = 1
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -55,7 +57,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-  
+
 ]
 
 ROOT_URLCONF = 'LinkUp.urls'
@@ -208,11 +210,9 @@ SIMPLE_JWT = {
 
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
 ]
-
-
 
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -228,3 +228,10 @@ SOCIALACCOUNT_QUERY_EMAIL = True
 
 SOCIALACCOUNT_FACEBOOK_APP_ID = '716864823524971'
 SOCIALACCOUNT_FACEBOOK_API_SECRET = 'f2a8572ab13c0ed3056cc8e33426018f'
+
+
+CELERY_BROKER_URL = 'amqp://localhost'
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'

@@ -18,6 +18,8 @@ urlpatterns = [
     path('users/', include('users.urls')),
     path('admin/', include('custom_admin.urls')),
     path('socialauth/', include('socialauth.urls')),
+    path('post/', include('post.urls')),
+
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
