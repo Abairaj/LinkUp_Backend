@@ -1,6 +1,7 @@
 from pathlib import Path
 import os
 from datetime import timedelta
+from celery.schedules import crontab
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -212,6 +213,7 @@ SIMPLE_JWT = {
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+ 
 ]
 
 
@@ -230,8 +232,37 @@ SOCIALACCOUNT_FACEBOOK_APP_ID = '716864823524971'
 SOCIALACCOUNT_FACEBOOK_API_SECRET = 'f2a8572ab13c0ed3056cc8e33426018f'
 
 
-CELERY_BROKER_URL = 'amqp://localhost'
+# # Celery configuration
+# CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//'  # RabbitMQ message broker URL
+# CELERY_RESULT_BACKEND = 'db+postgresql://postgres:7156@localhost:5432/linkup'  # Store Celery results in the Django database
+# CELERY_TIMEZONE = 'UTC'
+
+
+
+
+CELERY_TASK_ACKS_LATE = True
+CELERY_TASK_ACKNOWLEDGEMENTS = True
+CELERY_TASK_RESULT_EXPIRES = 3600
+CELERY_TASK_DEFAULT_QUEUE = 'default'
 CELERY_RESULT_BACKEND = 'django-db'
-CELERY_ACCEPT_CONTENT = ['json']
+CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672+/'
+
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
+CELERY_ACCEPT_CONTENT = ['json']
+
+
+
+
+
+
+
+
+# # Django Celery Beat scheduler configuration
+# CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+# CELERY_BEAT_SCHEDULE = {
+#     'compress-media-every-5-minutes': {
+#         'task': 'posts.tasks.compress_media',
+#         'schedule': crontab(minute='*/5'),  # Schedule task to run every 5 minutes
+#     },
+# }

@@ -2,7 +2,6 @@ from rest_framework import serializers
 from .models import Post
 from django.core.files.storage import FileSystemStorage
 from django.core.files import File
-from .task import process_Post
 from urllib.parse import urlsplit
 
 
