@@ -19,6 +19,7 @@ class Post(models.Model):
 
 
 class Comment(models.Model):
+    comment_id = models.BigAutoField(primary_key=True)
     user = models.ForeignKey(user, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     content = models.TextField()

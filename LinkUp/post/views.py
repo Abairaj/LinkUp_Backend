@@ -23,15 +23,19 @@ class PostAPIView(APIView):
         except:
             return Response(stateus=status.HTTP_404_NOT_FOUND)
 
-    def get(self, request, user_id):
-        User = Post.objects.select_related('user').filter(user=user_id)
-        if User:
-            serializer = GETPostSerializers(User, many=True)
-            return Response({"data": serializer.data}, status=status.HTTP_302_FOUND)
+    def get(self, request):
+        post = Post.objects.select_related('user').all()
+        for p in post:
+            print(p.user)
+        if post:
+            serializer = GETPostSerializers(post, many=True)
+            return Response({"data": serializer.data}, status=status.HTTP_200_OK)
         else:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response({'message':'No posts'},status=status.HTTP_404_NOT_FOUND)
 
     def post(self, request, *args, **kwargs):
+        serializer = PostSerializers(data=request.data)
+        serializer.is_valid(raise_exception=True)
         User = self.kwargs.get('user_id')
         usr = user.objects.get(pk=User)
         caption = request.data.get('caption')
@@ -59,6 +63,12 @@ class PostAPIView(APIView):
 
 
 class Post_Like_Unlike_APIView(APIView):
+    def get_user(self, user_id):
+        try:
+            user_obj = user.objects.get(pk=user_id)
+            return user_obj
+        except user.DoesNotExist:
+            return None
 
     def post(self, request, user_id):
         serializer = LikeSerializer(data=request.data)
@@ -67,18 +77,24 @@ class Post_Like_Unlike_APIView(APIView):
 
         try:
             post = Post.objects.get(post_id=post_id)
-
         except Post.DoesNotExist:
             return Response('Post does not exist', status=status.HTTP_404_NOT_FOUND)
 
-        if user_id in post.likes.all():
-            post.likes.remove(user_id)
+        user_obj = self.get_user(user_id)
+        if not user_obj:
+            return Response('User does not exist', status=status.HTTP_404_NOT_FOUND)
+
+        if user_obj in post.likes.all():
+            post.likes.remove(user_obj)
             message = 'Post Unliked'
         else:
-            post.likes.add(user_id)
+            post.likes.add(user_obj)
             message = 'Post Liked'
 
-        return Response({'message': message}, status=status.HTTP_201_CREATED)
+        # Serialize the updated post object
+        serializer = PostSerializers(post)
+        return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+
 
 
 class Post_Comment(APIView):
