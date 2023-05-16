@@ -25,22 +25,24 @@ class PostAPIView(APIView):
 
     def get(self, request):
         post = Post.objects.select_related('user').all()
-        for p in post:
-            print(p.user)
         if post:
             serializer = GETPostSerializers(post, many=True)
             return Response({"data": serializer.data}, status=status.HTTP_200_OK)
         else:
-            return Response({'message':'No posts'},status=status.HTTP_404_NOT_FOUND)
+            return Response({'message': 'No posts'}, status=status.HTTP_404_NOT_FOUND)
 
     def post(self, request, *args, **kwargs):
+        print(request)
         serializer = PostSerializers(data=request.data)
+        print(request.data)
         serializer.is_valid(raise_exception=True)
         User = self.kwargs.get('user_id')
         usr = user.objects.get(pk=User)
         caption = request.data.get('caption')
         media_type = request.data.get('media_type')
         media_url = request.FILES.get('media_url')
+
+        print(caption, media_type, media_url)
 
         file_path = default_storage.save(
             media_url, ContentFile(media_url.read()))
@@ -53,10 +55,8 @@ class PostAPIView(APIView):
         post_id = post.post_id
         try:
             post = Post.objects.get(post_id=post_id)
-            print('kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk')
             compress_media.delay(
                 post_id=post_id, media_url=file_path, file_name=media_url.name)
-            print('jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj')
             return Response({'message': 'Media compression task queued successfully'})
         except Post.DoesNotExist:
             return Response({'error': f'Post with ID {post_id} does not exist'}, status=400)
@@ -96,23 +96,34 @@ class Post_Like_Unlike_APIView(APIView):
         return Response(data=serializer.data, status=status.HTTP_201_CREATED)
 
 
-
 class Post_Comment(APIView):
 
-    def get(self,request):
-        pass
+    def get(self, request):
+        post_id = request.GET.get('post_id')
+        print(post_id)
+        comments = Comment.objects.select_related('post').select_related('user').filter(post=post_id)
+        if comments:
+            serializer = CommentSerializer(comments, many=True)
+            return Response({'data': serializer.data}, status=status.HTTP_200_OK)
 
-
-    def post(self, request, user_id):
+    def post(self, request):
         serializer = CommentSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response({'message': "comment added"}, status=status.HTTP_201_CREATED)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': "comment added"}, status=status.HTTP_201_CREATED)
 
-    def patch(self, request):
-        serializer = CommentSerializer(data=request.data,partial=True)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(status=status.HTTP_200_OK)
-    
-    
+        else:
+            print(serializer.errors)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request):
+        comment_id = request.data.get('comment_id')
+
+        try:
+            comment = Comment.objects.get(comment_id=comment_id)
+
+        except Comment.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        comment.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
