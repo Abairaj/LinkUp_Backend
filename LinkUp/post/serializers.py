@@ -38,13 +38,14 @@ class LikeSerializer(serializers.Serializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    post = PostSerializers()
-    user = UserProfileSerializer()
-
     class Meta:
         model = Comment
         fields = '__all__'
 
 
-class GetCommentSerializer(serializers.Serializer):
-    post_id = serializers.IntegerField()
+class GetCommentSerializer(serializers.ModelSerializer):
+        user = UserProfileSerializer()
+        class Meta:
+            model = Comment
+            fields = '__all__'
+

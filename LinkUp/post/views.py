@@ -3,14 +3,21 @@ from .models import Post
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.pagination import PageNumberPagination
 from rest_framework import status
 from users.models import user
 from .models import Post, Comment
-from .serializers import PostSerializers, GETPostSerializers, LikeSerializer, CommentSerializer
+from .serializers import PostSerializers, GETPostSerializers, LikeSerializer, CommentSerializer, GetCommentSerializer
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.conf import settings
 from .task import compress_media
+
+
+# # for pagination of comments
+# class Comment_pagination(PageNumberPagination):
+#     page_size = 5
+#     page_query_param='page_size'
 
 
 class PostAPIView(APIView):
@@ -23,8 +30,18 @@ class PostAPIView(APIView):
         except:
             return Response(stateus=status.HTTP_404_NOT_FOUND)
 
-    def get(self, request):
-        post = Post.objects.select_related('user').all()
+    def get(self, request, user_id):
+        filter = None
+        try:
+            filter = request.GET.get('filter')
+            print(filter)
+        except:
+            print('no filter')
+
+        if filter == 'user_post':
+            post = Post.objects.filter(user=user_id).order_by('-created_at')
+        else:
+            post = Post.objects.select_related('user').all().order_by('-created_at')
         if post:
             serializer = GETPostSerializers(post, many=True)
             return Response({"data": serializer.data}, status=status.HTTP_200_OK)
@@ -101,12 +118,21 @@ class Post_Comment(APIView):
     def get(self, request):
         post_id = request.GET.get('post_id')
         print(post_id)
-        comments = Comment.objects.select_related('post').select_related('user').filter(post=post_id)
+        comments = Comment.objects.select_related(
+            'user').filter(post=post_id).order_by('created_at')
+        print(comments)
+
+        # pagination for comments
+        # paginator = Comment_pagination()
+        # paginated_comments = paginator.paginate_queryset(comments,request)
+
         if comments:
-            serializer = CommentSerializer(comments, many=True)
-            return Response({'data': serializer.data}, status=status.HTTP_200_OK)
+            serializer = GetCommentSerializer(comments, many=True)
+            # response = paginator.get_paginated_response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
+        print(request.data)
         serializer = CommentSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
