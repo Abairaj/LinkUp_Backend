@@ -9,3 +9,8 @@ class AdminLoginSerializer(serializers.ModelSerializer):
     class Meta:
         model = user
         fields = ("email", "password")
+
+class UserListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = user
+        fields = "__all__"

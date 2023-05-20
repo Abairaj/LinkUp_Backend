@@ -14,14 +14,11 @@ from django.conf import settings
 from .task import compress_media
 
 
-# # for pagination of comments
-# class Comment_pagination(PageNumberPagination):
-#     page_size = 5
-#     page_query_param='page_size'
+
 
 
 class PostAPIView(APIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get_object(self, user_id):
         try:
@@ -40,6 +37,8 @@ class PostAPIView(APIView):
 
         if filter == 'user_post':
             post = Post.objects.filter(user=user_id).order_by('-created_at')
+        elif filter == 'reels':
+            post = Post.objects.filter(media_type = 'Video').all().order_by('-created_at')
         else:
             post = Post.objects.select_related('user').all().order_by('-created_at')
         if post:
