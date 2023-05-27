@@ -14,51 +14,39 @@ from django.conf import settings
 from .task import compress_media
 
 
-
-
-
 class PostAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get_object(self, user_id):
+    def get_object(self, user_id=None):
         try:
             User = user.objects.get(pk=user_id)
             return User
         except:
             return Response(stateus=status.HTTP_404_NOT_FOUND)
 
-    def get(self, request, user_id):
-        filter = None
-        try:
-            filter = request.GET.get('filter')
-            print(filter)
-        except:
-            print('no filter')
-
-        if filter == 'user_post':
-            post = Post.objects.filter(user=user_id).order_by('-created_at')
-        elif filter == 'reels':
-            post = Post.objects.filter(media_type = 'Video').all().order_by('-created_at')
-        else:
-            post = Post.objects.select_related('user').all().order_by('-created_at')
+    def get(self, request):
+        post = Post.objects.select_related(
+            'user').all().order_by('-created_at')
         if post:
             serializer = GETPostSerializers(post, many=True)
             return Response({"data": serializer.data}, status=status.HTTP_200_OK)
         else:
             return Response({'message': 'No posts'}, status=status.HTTP_404_NOT_FOUND)
 
+
+class Create_Post_API_VIEW(APIView):
+
     def post(self, request, *args, **kwargs):
         print(request)
         serializer = PostSerializers(data=request.data)
         print(request.data)
         serializer.is_valid(raise_exception=True)
+
         User = self.kwargs.get('user_id')
         usr = user.objects.get(pk=User)
         caption = request.data.get('caption')
         media_type = request.data.get('media_type')
         media_url = request.FILES.get('media_url')
-
-        print(caption, media_type, media_url)
 
         file_path = default_storage.save(
             media_url, ContentFile(media_url.read()))
@@ -67,7 +55,7 @@ class PostAPIView(APIView):
 
         post = Post.objects.create(
             user=usr, caption=caption, media_type=media_type, media_url=file_path)
-
+        return Response(status=status.HTTP_200_OK)
         post_id = post.post_id
         try:
             post = Post.objects.get(post_id=post_id)
@@ -76,6 +64,19 @@ class PostAPIView(APIView):
             return Response({'message': 'Media compression task queued successfully'})
         except Post.DoesNotExist:
             return Response({'error': f'Post with ID {post_id} does not exist'}, status=400)
+
+
+class Reels_API_VIEW(APIView):
+    def get(self, request):
+
+        post = Post.objects.select_related('user').filter(
+            media_type="Video").order_by("-created_at")
+
+        if post:
+            serializer = GETPostSerializers(post, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({"message": "Post does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
 
 class Post_Like_Unlike_APIView(APIView):
@@ -114,21 +115,25 @@ class Post_Like_Unlike_APIView(APIView):
 
 class Post_Comment(APIView):
 
-    def get(self, request):
-        post_id = request.GET.get('post_id')
+    def get(self, request,post_id):
         print(post_id)
         comments = Comment.objects.select_related(
             'user').filter(post=post_id).order_by('created_at')
-        print(comments)
+        print(comments,'dddd/////////////////')
 
         # pagination for comments
         # paginator = Comment_pagination()
         # paginated_comments = paginator.paginate_queryset(comments,request)
 
         if comments:
+            print('2,////////////////////////')
             serializer = GetCommentSerializer(comments, many=True)
             # response = paginator.get_paginated_response(serializer.data)
             return Response(serializer.data, status=status.HTTP_200_OK)
+
+        else:
+            print('3,/////////////////////////////')
+            return Response({"message":"No comments yet"},status=status.HTTP_404_NOT_FOUND)        
 
     def post(self, request):
         print(request.data)

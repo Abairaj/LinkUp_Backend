@@ -46,6 +46,7 @@ class AdminUsersAPIView(APIView):
     def patch(self, request, user_id):
         try:
             User = user.objects.get(id=user_id)
+            print(request.data['is_banned'])
 
         except user.DoesNotExist:
             return Response({"error":"user does not exist"}, status=status.HTTP_404_NOT_FOUND)
@@ -54,6 +55,9 @@ class AdminUsersAPIView(APIView):
             serializer = UserListSerializer(instance=User,data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
-                return Response({"message":"User data modified"},status=status.HTTP_200_OK)
+                if User.is_banned == True:
+                    return Response({'message':"user banned successfully"})
+                elif User.is_banned == False:
+                    return Response({'message':"user unbanned successfully"})
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
