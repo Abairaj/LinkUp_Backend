@@ -15,8 +15,6 @@ from .task import compress_media
 
 
 class PostAPIView(APIView):
-    permission_classes = [IsAuthenticated]
-
     def get_object(self, user_id=None):
         try:
             User = user.objects.get(pk=user_id)
@@ -41,30 +39,10 @@ class Create_Post_API_VIEW(APIView):
         serializer = PostSerializers(data=request.data)
         print(request.data)
         serializer.is_valid(raise_exception=True)
-
-        User = self.kwargs.get('user_id')
-        usr = user.objects.get(pk=User)
-        caption = request.data.get('caption')
-        media_type = request.data.get('media_type')
-        media_url = request.FILES.get('media_url')
-
-        file_path = default_storage.save(
-            media_url, ContentFile(media_url.read()))
-
+        serializer.save()
         # saving post object without mediafile
-
-        post = Post.objects.create(
-            user=usr, caption=caption, media_type=media_type, media_url=file_path)
         return Response(status=status.HTTP_200_OK)
-        post_id = post.post_id
-        try:
-            post = Post.objects.get(post_id=post_id)
-            compress_media.delay(
-                post_id=post_id, media_url=file_path, file_name=media_url.name)
-            return Response({'message': 'Media compression task queued successfully'})
-        except Post.DoesNotExist:
-            return Response({'error': f'Post with ID {post_id} does not exist'}, status=400)
-
+      
 
 class Reels_API_VIEW(APIView):
     def get(self, request):

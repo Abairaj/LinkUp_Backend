@@ -2,6 +2,8 @@ from pathlib import Path
 import os
 from datetime import timedelta
 from celery.schedules import crontab
+from dotenv import load_dotenv
+load_dotenv()
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -12,7 +14,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-b-b_r92%fc7dmkt+(*%b_ugokeq5k9)!%p)3*5k84dbz=kq%lu'
+SECRET_KEY = str(os.getenv('SECRET_KEY'))
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -41,6 +43,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     "corsheaders",
     'celery',
+    'cloudinary',
     'users',
     'socialauth',
     'custom_admin',
@@ -266,3 +269,14 @@ CELERY_ACCEPT_CONTENT = ['json']
 #         'schedule': crontab(minute='*/5'),  # Schedule task to run every 5 minutes
 #     },
 # }
+
+
+
+# cloudinary
+
+CLOUDINARY_STORAGE = {
+'CLOUD_NAME': str(os.getenv('CLOUD_NAME')),
+'API_KEY': str(os.getenv('CLOUD_KEY')),
+'API_SECRET': str(os.getenv('CLOUD_SECRET')),
+}
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
