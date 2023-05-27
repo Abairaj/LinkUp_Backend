@@ -35,13 +35,14 @@ class UserProfileSerializer(serializers.ModelSerializer):
     phone = serializers.RegexField(regex=r'^\d{10}$')
     bio = serializers.CharField(allow_blank=True)
     followers = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    following = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     created_at = serializers.DateTimeField(read_only=True)
     last_login = serializers.DateTimeField(read_only=True)
 
     class Meta:
         model = user
         fields = ('id', 'email', 'username', 'full_name', 'profile', 'gender',
-                  'phone', 'bio', 'followers', 'created_at', 'last_login')
+                  'phone', 'bio', 'followers','following', 'created_at', 'last_login')
 
 
 class UserFollowSerializer(serializers.Serializer):

@@ -99,7 +99,7 @@ class UserProfileAPIView(APIView):
         User = self.get_object(pk)
         if User:
             serializer = UserProfileSerializer(User)
-            return Response({"user": serializer.data}, status=status.HTTP_200_OK)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -118,7 +118,12 @@ class UserProfileAPIView(APIView):
 
 
 class UserFollowView(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
+
+    def get(self,request,user_id):
+        pass
+        
+
 
     def post(self, request, user_id):
         serializer = UserFollowSerializer(data=request.data)
@@ -128,11 +133,15 @@ class UserFollowView(APIView):
                 authenticated_user = user.objects.get(id=user_id)
             except user.DoesNotExist:
                 return Response({"message": "User does not exist"}, status=status.HTTP_404_NOT_FOUND)
+
+
             if authenticated_user in user_to_follow.followers.all():
                 user_to_follow.followers.remove(user_id)
+                authenticated_user.following.remove(user_to_follow)
                 return Response({"message": "User unfollowed successfully"}, status=status.HTTP_201_CREATED)
             else:
                 user_to_follow.followers.add(user_id)
+                authenticated_user.following.add(user_to_follow)
                 serializer = UserProfileSerializer(user_to_follow, many=True)
                 return Response({"message": "User followed successfully"}, status=status.HTTP_201_CREATED)
         else:
