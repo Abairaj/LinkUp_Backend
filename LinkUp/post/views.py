@@ -11,8 +11,7 @@ from .serializers import PostSerializers, GETPostSerializers, LikeSerializer, Co
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.conf import settings
-from .task import compress_media
-
+from .task import Compress_media
 
 class PostAPIView(APIView):
     def get_object(self, user_id=None):
@@ -35,7 +34,6 @@ class PostAPIView(APIView):
 class Create_Post_API_VIEW(APIView):
 
     def post(self, request, *args, **kwargs):
-        print(request)
         serializer = PostSerializers(data=request.data)
         print(request.data)
         serializer.is_valid(raise_exception=True)
@@ -135,3 +133,9 @@ class Post_Comment(APIView):
 
         comment.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class test(APIView):
+    def post(rself,equest):
+        Compress_media.delay(media_file='file')
+
+        return Response(status=status.HTTP_200_OK)

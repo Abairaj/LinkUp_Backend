@@ -19,7 +19,10 @@ urlpatterns = [
 
     path('Post_like/<int:user_id>',views.Post_Like_Unlike_APIView.as_view(),name='Postlike'),
     path('add_comment/',views.Post_Comment.as_view(),name='Comment'),
-    path('get_comment/<int:post_id>',views.Post_Comment.as_view(),name='Comment')
+    path('get_comment/<int:post_id>',views.Post_Comment.as_view(),name='Comment'),
+
+
+    path('test/',views.test.as_view(),name='test')
 
 
 ] 
