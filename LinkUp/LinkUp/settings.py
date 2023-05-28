@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'dj_rest_auth.registration',
     'rest_framework.authtoken',
-    'allauth.socialaccount.providers.facebook',
+    'allauth.socialaccount.providers.google', # for Google OAuth 2.0
     'rest_framework_simplejwt',
     "corsheaders",
     'celery',
@@ -51,6 +51,12 @@ INSTALLED_APPS = [
 ]
 SITE_ID = 1
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Additional configuration settings
+SOCIALACCOUNT_QUERY_EMAIL = True
+ACCOUNT_LOGOUT_ON_GET= True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_EMAIL_REQUIRED = True
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -221,11 +227,14 @@ CORS_ALLOWED_ORIGINS = [
 
 
 SOCIALACCOUNT_PROVIDERS = {
-    'facebook': {
-        'SCOPE': ['email'],
-        'METHOD': 'oauth2',
-        'VERIFIED_EMAIL': False,
-        'VERSION': 'v10.0',
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
     }
 }
 
@@ -244,6 +253,8 @@ SOCIALACCOUNT_FACEBOOK_API_SECRET = 'f2a8572ab13c0ed3056cc8e33426018f'
 
 
 CELERY_BROKER_URL = 'amqp://localhost'
+CELERY_RESULT_BACKEND = 'rpc://'  # Store Celery results in the Django database
+
 
 
 
@@ -266,12 +277,19 @@ CELERY_BROKER_URL = 'amqp://localhost'
 
 # cloudinary
 
-CLOUDINARY_STORAGE = {
-'CLOUD_NAME': str(os.getenv('CLOUD_NAME')),
-'API_KEY': str(os.getenv('CLOUD_KEY')),
-'API_SECRET': str(os.getenv('CLOUD_SECRET')),
-}
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+# CLOUDINARY= {
+# 'CLOUD_NAME': str(os.getenv('CLOUD_NAME')),
+# 'API_KEY': str(os.getenv('CLOUD_KEY')),
+# 'API_SECRET': str(os.getenv('CLOUD_SECRET')),
+# }
 
 
+import cloudinary
 
+
+cloudinary.config(
+  cloud_name = str(os.getenv('CLOUD_NAME')),
+  api_key = str(os.getenv('CLOUD_KEY')),
+  api_secret = str(os.getenv('CLOUD_SECRET')),
+  secure = True
+)

@@ -4,7 +4,7 @@ from . import views
 
 
 urlpatterns = [
-    path('dj-rest-auth/facebook/' ,views.FacebookLogin.as_view(),name='fb_login')
+    path('google/', views.GoogleLogin.as_view(), name='google_login'),
 
     
 ]

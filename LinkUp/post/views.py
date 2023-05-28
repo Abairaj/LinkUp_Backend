@@ -33,12 +33,12 @@ class PostAPIView(APIView):
 
 class Create_Post_API_VIEW(APIView):
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request,user_id):
         serializer = PostSerializers(data=request.data)
         print(request.data)
         serializer.is_valid(raise_exception=True)
+        print('////////////////////////////////////////////////////////////////////////////////')
         serializer.save()
-        # saving post object without mediafile
         return Response(status=status.HTTP_200_OK)
       
 
@@ -136,6 +136,8 @@ class Post_Comment(APIView):
 
 class test(APIView):
     def post(rself,equest):
-        Compress_media.delay(media_file='file')
+        res = Compress_media.delay(media_file='file')
+        if  not res.successful():
+            return Response("task done",status=status.HTTP_200_OK)
 
         return Response(status=status.HTTP_200_OK)
