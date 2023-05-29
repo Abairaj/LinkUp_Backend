@@ -32,12 +32,10 @@ def compressing_videos(video_file):
     file_path = video_file.temporary_file_path()
 
     # Generate the output file path
-    output_file = os.path.splitext(file_path)[0] + ".mp4"
-    print(output_file,'output////////////////////////////////////////////////')
-    print(video_file,'videofile///////////////////////////////////////////////////////////////')
-    
+    output_file = os.path.splitext(video_file.name)[0] + "_compressed.mp4"
+
     # Open the input video file
-    clip = VideoFileClip(video_file.path)
+    clip = VideoFileClip(file_path)
     
     # Calculate the target width and height for a 9:16 aspect ratio
     target_width = clip.w
@@ -53,12 +51,11 @@ def compressing_videos(video_file):
     # Resize the video to the desired height for compression
     compressed_clip = cropped_clip.resize(height=720)  # Set the desired height for compression
 
-
     # Calculate the target bitrate to limit the output video size
-    target_bitrate = 9000000  # 10 Mbps
+    target_bitrate = 9000000  # 9 Mbps
     
     # Compress the video by reducing the bitrate and setting the output format
-    compressed_clip.write_videofile(output_file, bitrate="1000k", codec="libx264", audio_codec="aac")
+    compressed_clip.write_videofile(output_file, bitrate=str(target_bitrate), codec="libx264", audio_codec="aac")
     
     # Close the clips
     clip.close()
@@ -67,10 +64,3 @@ def compressing_videos(video_file):
     
     # Return the path of the compressed video file
     return output_file
-
-
-
-
-
-
-
