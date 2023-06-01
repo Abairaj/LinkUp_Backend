@@ -155,18 +155,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # django rest framework
 
 REST_FRAMEWORK = {
-
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend'
     ],
-
-    'DEFAULT_AUTHENTICATION_CLASSES': (
+    'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-
-    )
-
+    ],
 }
-
 
 # pagination
 REST_FRAMEWORK = {
@@ -274,6 +269,3 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': str(os.getenv('CLOUD_SECRET')),
 }
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-
-
-
