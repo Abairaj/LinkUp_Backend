@@ -3,8 +3,7 @@ from .models import Post, Comment
 from users.serializers import UserProfileSerializer
 from users.models import user
 from post.models import Post
-from .helper import compressing_image,compressing_videos
-
+from .helper import compressing_image, compressing_videos
 
 
 class PostSerializers(serializers.ModelSerializer):
@@ -21,25 +20,17 @@ class PostSerializers(serializers.ModelSerializer):
 
         if media_type == "Image":
             compressed_image = compressing_image(media_file, image_name)
-            print(compressed_image,'/////////////////////////////')
+            print(compressed_image, '/////////////////////////////')
             instance.media_url = compressed_image
             instance.save()
             return instance
         elif media_type == "Video":
             compressed_video = compressing_videos(media_file)
             if compressed_video:
-                print(compressed_video,'////////////////////////////')
+                print(compressed_video, '////////////////////////////')
                 instance.media_url = compressed_video
                 instance.save()
             return instance
-
-
-
-
-
-
-      
-
 
 
 class GETPostSerializers(serializers.ModelSerializer):
@@ -61,8 +52,8 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class GetCommentSerializer(serializers.ModelSerializer):
-        user = UserProfileSerializer()
-        class Meta:
-            model = Comment
-            fields = '__all__'
+    user = UserProfileSerializer()
 
+    class Meta:
+        model = Comment
+        fields = '__all__'

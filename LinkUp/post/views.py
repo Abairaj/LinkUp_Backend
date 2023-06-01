@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from .models import Post
 from rest_framework.views import APIView
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
@@ -13,7 +14,10 @@ from django.core.files.base import ContentFile
 from django.conf import settings
 from .task import Compress_media
 
+
 class PostAPIView(APIView):
+    pagination_class = PageNumberPagination
+
     def get_object(self, user_id=None):
         try:
             User = user.objects.get(pk=user_id)
@@ -22,25 +26,24 @@ class PostAPIView(APIView):
             return Response(stateus=status.HTTP_404_NOT_FOUND)
 
     def get(self, request):
-        post = Post.objects.select_related(
-            'user').all().order_by('-created_at')
-        if post:
-            serializer = GETPostSerializers(post, many=True)
-            return Response({"data": serializer.data}, status=status.HTTP_200_OK)
-        else:
-            return Response({'message': 'No posts'}, status=status.HTTP_404_NOT_FOUND)
+        paginator = self.pagination_class()
+        posts = Post.objects.select_related('user').order_by('-created_at')
+        paginated_posts = paginator.paginate_queryset(posts, request)
+        serializer = GETPostSerializers(paginated_posts, many=True)
+        print(paginated_posts, '//////////////')
+        return paginator.get_paginated_response(serializer.data)
 
 
 class Create_Post_API_VIEW(APIView):
 
-    def post(self, request,user_id):
+    def post(self, request, user_id):
         serializer = PostSerializers(data=request.data)
         print(request.data)
         serializer.is_valid(raise_exception=True)
         print('////////////////////////////////////////////////////////////////////////////////')
         serializer.save()
         return Response(status=status.HTTP_200_OK)
-      
+
 
 class Reels_API_VIEW(APIView):
     def get(self, request):
@@ -91,11 +94,11 @@ class Post_Like_Unlike_APIView(APIView):
 
 class Post_Comment(APIView):
 
-    def get(self, request,post_id):
+    def get(self, request, post_id):
         print(post_id)
         comments = Comment.objects.select_related(
             'user').filter(post=post_id).order_by('created_at')
-        print(comments,'dddd/////////////////')
+        print(comments, 'dddd/////////////////')
 
         # pagination for comments
         # paginator = Comment_pagination()
@@ -109,7 +112,7 @@ class Post_Comment(APIView):
 
         else:
             print('3,/////////////////////////////')
-            return Response({"message":"No comments yet"},status=status.HTTP_404_NOT_FOUND)        
+            return Response({"message": "No comments yet"}, status=status.HTTP_404_NOT_FOUND)
 
     def post(self, request):
         print(request.data)
@@ -134,10 +137,11 @@ class Post_Comment(APIView):
         comment.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
 class test(APIView):
-    def post(rself,equest):
+    def post(rself, equest):
         res = Compress_media.delay(media_file='file')
-        if  not res.successful():
-            return Response("task done",status=status.HTTP_200_OK)
+        if not res.successful():
+            return Response("task done", status=status.HTTP_200_OK)
 
         return Response(status=status.HTTP_200_OK)

@@ -1,6 +1,5 @@
 from django.db import models
 from users.models import user
-from cloudinary.models import CloudinaryField
 
 
 class Post(models.Model):
@@ -15,7 +14,7 @@ class Post(models.Model):
     user = models.ForeignKey(user, on_delete=models.CASCADE)
     caption = models.TextField(blank=True, null=True)
     media_type = models.CharField(max_length=10, choices=MEDIA_CHOICES)
-    media_url = CloudinaryField(resource_type='auto')
+    media_url = models.FileField(upload_to='post')
     created_at = models.DateTimeField(auto_now=True)
 
 

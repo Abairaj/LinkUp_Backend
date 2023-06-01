@@ -87,7 +87,7 @@ class UserLoginAPIView(TokenObtainPairView):
 
 
 class UserProfileAPIView(APIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get_object(self, pk):
         try:
@@ -118,14 +118,11 @@ class UserProfileAPIView(APIView):
 
 
 class UserFollowView(APIView):
-    # permission_classes = [IsAuthenticated]
-
-    def get(self,request,user_id):
-        pass
-        
-
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, user_id):
+        print(user_id,'lllllllllllll')
+        print(request.data.get("user_id"),'ddddddddddddddd')
         serializer = UserFollowSerializer(data=request.data)
         if serializer.is_valid():
             user_to_follow = serializer.validated_data['user_id']

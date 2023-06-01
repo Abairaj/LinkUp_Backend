@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'dj_rest_auth.registration',
     'rest_framework.authtoken',
-    'allauth.socialaccount.providers.google', # for Google OAuth 2.0
+    'allauth.socialaccount.providers.google',  # for Google OAuth 2.0
     'rest_framework_simplejwt',
     "corsheaders",
     'celery',
@@ -54,7 +54,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Additional configuration settings
 SOCIALACCOUNT_QUERY_EMAIL = True
-ACCOUNT_LOGOUT_ON_GET= True
+ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_EMAIL_REQUIRED = True
 
@@ -168,6 +168,13 @@ REST_FRAMEWORK = {
 }
 
 
+# pagination
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 15
+}
+
+
 AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend",
@@ -222,7 +229,7 @@ SIMPLE_JWT = {
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
- 
+
 ]
 
 
@@ -240,9 +247,6 @@ SOCIALACCOUNT_PROVIDERS = {
 
 SOCIALACCOUNT_QUERY_EMAIL = True
 
-SOCIALACCOUNT_FACEBOOK_APP_ID = '716864823524971'
-SOCIALACCOUNT_FACEBOOK_API_SECRET = 'f2a8572ab13c0ed3056cc8e33426018f'
-
 
 # # Celery configuration
 # CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//'  # RabbitMQ message broker URL
@@ -250,18 +254,8 @@ SOCIALACCOUNT_FACEBOOK_API_SECRET = 'f2a8572ab13c0ed3056cc8e33426018f'
 # CELERY_TIMEZONE = 'UTC'
 
 
-
-
 CELERY_BROKER_URL = 'amqp://localhost'
 CELERY_RESULT_BACKEND = 'rpc://'  # Store Celery results in the Django database
-
-
-
-
-
-
-
-
 
 
 # # Django Celery Beat scheduler configuration
@@ -274,22 +268,12 @@ CELERY_RESULT_BACKEND = 'rpc://'  # Store Celery results in the Django database
 # }
 
 
-
-# cloudinary
-
-# CLOUDINARY= {
-# 'CLOUD_NAME': str(os.getenv('CLOUD_NAME')),
-# 'API_KEY': str(os.getenv('CLOUD_KEY')),
-# 'API_SECRET': str(os.getenv('CLOUD_SECRET')),
-# }
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': str(os.getenv('CLOUD_NAME')),
+    'API_KEY': str(os.getenv('CLOUD_KEY')),
+    'API_SECRET': str(os.getenv('CLOUD_SECRET')),
+}
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 
-import cloudinary
 
-
-cloudinary.config(
-  cloud_name = str(os.getenv('CLOUD_NAME')),
-  api_key = str(os.getenv('CLOUD_KEY')),
-  api_secret = str(os.getenv('CLOUD_SECRET')),
-  secure = True
-)
