@@ -16,6 +16,7 @@ class Post(models.Model):
     media_type = models.CharField(max_length=10, choices=MEDIA_CHOICES)
     media_url = models.FileField(upload_to='post')
     created_at = models.DateTimeField(auto_now=True)
+    deleted = models.BooleanField(default=False)
 
 
 class Comment(models.Model):

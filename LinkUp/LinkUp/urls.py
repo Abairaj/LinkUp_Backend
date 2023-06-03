@@ -19,6 +19,10 @@ urlpatterns = [
     path('admin/', include('custom_admin.urls')),
     path('socialauth/', include('socialauth.urls')),
     path('post/', include('post.urls')),
+    path('report/', include('report.urls')),
+    path('chats/', include('chat.routing')),
+
+
 
 
 

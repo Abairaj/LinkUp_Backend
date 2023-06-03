@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import user
+from post.models import Post
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -23,6 +24,11 @@ class UserLoginSerializer(serializers.ModelSerializer):
     class Meta:
         model = user
         fields = ("email", "password")
+
+class PostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = "__all__"
 
 
 class UserProfileSerializer(serializers.ModelSerializer):

@@ -6,25 +6,46 @@ from moviepy.editor import VideoFileClip
 
 
 def compressing_image(image, image_name):
+    # Open the image using Pillow
     img = Image.open(image)
 
+    # Convert the image to RGB color mode
+    img = img.convert("RGB")
+
+    # Create a BytesIO object to store the compressed image data
     img_io = BytesIO()
+
+    # Compress and save the image in JPEG format with quality 70
     img.save(img_io, format='JPEG', quality=70, optimize=True)
+
+    # Move the pointer to the beginning of the BytesIO stream
     img_io.seek(0)
 
+    # Get the original image format
+    image_format = image.name.split(".")[-1]
+
+    # Create a new InMemoryUploadedFile with the compressed image data
     new_image = InMemoryUploadedFile(
         img_io,
         None,
         image_name,
-        'image/jpeg',
+        f'image/{image_format.lower()}',
         img_io.tell(),
         None
     )
-    print('compressed//////////////////////////////////////////////////////')
+
+    # Print a message to indicate that the image has been compressed
+    print('Image compressed')
 
     return new_image
+<<<<<<< HEAD
 # def compressing_videos(video_file):
 #     file_path = video_file.temporary_file_path()
+=======
+
+def compressing_videos(video_file):
+    file_path = video_file.temporary_file_path()
+>>>>>>> Chat
 
 #     # Generate the output file path
 #     output_file = os.path.splitext(video_file.name)[0] + "_compressed.mp4"
