@@ -87,7 +87,7 @@ class UserLoginAPIView(TokenObtainPairView):
 
 
 class UserProfileAPIView(APIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get_object(self, pk):
         try:
@@ -118,12 +118,10 @@ class UserProfileAPIView(APIView):
 
 
 class UserFollowView(APIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
-    def get(self,request,user_id):
+    def get(self, request, user_id):
         pass
-        
-
 
     def post(self, request, user_id):
         serializer = UserFollowSerializer(data=request.data)
@@ -133,7 +131,6 @@ class UserFollowView(APIView):
                 authenticated_user = user.objects.get(id=user_id)
             except user.DoesNotExist:
                 return Response({"message": "User does not exist"}, status=status.HTTP_404_NOT_FOUND)
-
 
             if authenticated_user in user_to_follow.followers.all():
                 user_to_follow.followers.remove(user_id)
@@ -147,8 +144,6 @@ class UserFollowView(APIView):
         else:
             print(serializer.errors)
             return Response(status=status.HTTP_400_BAD_REQUEST)
-
-
 
 
 class UserSearchView(APIView):

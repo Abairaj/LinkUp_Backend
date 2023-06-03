@@ -25,6 +25,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -39,7 +40,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'dj_rest_auth.registration',
     'rest_framework.authtoken',
-    'allauth.socialaccount.providers.google', # for Google OAuth 2.0
+    'allauth.socialaccount.providers.google',  # for Google OAuth 2.0
     'rest_framework_simplejwt',
     "corsheaders",
     'celery',
@@ -48,13 +49,15 @@ INSTALLED_APPS = [
     'socialauth',
     'custom_admin',
     'post',
+    'report',
+    'chat'
 ]
 SITE_ID = 1
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Additional configuration settings
 SOCIALACCOUNT_QUERY_EMAIL = True
-ACCOUNT_LOGOUT_ON_GET= True
+ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_EMAIL_REQUIRED = True
 
@@ -90,6 +93,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'LinkUp.wsgi.application'
+ASGI_APPLICATION = 'LinkUp.asgi.application'
 
 
 # Database
@@ -163,7 +167,11 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
 
-    )
+    ),
+    'DEFAULT_PAGINATION_CLASS':
+    'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
+
 
 }
 
@@ -222,7 +230,7 @@ SIMPLE_JWT = {
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
- 
+
 ]
 
 
@@ -240,8 +248,7 @@ SOCIALACCOUNT_PROVIDERS = {
 
 SOCIALACCOUNT_QUERY_EMAIL = True
 
-SOCIALACCOUNT_FACEBOOK_APP_ID = '716864823524971'
-SOCIALACCOUNT_FACEBOOK_API_SECRET = 'f2a8572ab13c0ed3056cc8e33426018f'
+
 
 
 # # Celery configuration
@@ -250,18 +257,8 @@ SOCIALACCOUNT_FACEBOOK_API_SECRET = 'f2a8572ab13c0ed3056cc8e33426018f'
 # CELERY_TIMEZONE = 'UTC'
 
 
-
-
 CELERY_BROKER_URL = 'amqp://localhost'
 CELERY_RESULT_BACKEND = 'rpc://'  # Store Celery results in the Django database
-
-
-
-
-
-
-
-
 
 
 # # Django Celery Beat scheduler configuration
@@ -274,22 +271,25 @@ CELERY_RESULT_BACKEND = 'rpc://'  # Store Celery results in the Django database
 # }
 
 
-
 # cloudinary
-
-# CLOUDINARY= {
-# 'CLOUD_NAME': str(os.getenv('CLOUD_NAME')),
-# 'API_KEY': str(os.getenv('CLOUD_KEY')),
-# 'API_SECRET': str(os.getenv('CLOUD_SECRET')),
-# }
-
-
-import cloudinary
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': str(os.getenv('CLOUD_NAME')),
+    'API_KEY': str(os.getenv('CLOUD_KEY')),
+    'API_SECRET': str(os.getenv('CLOUD_SECRET')),
+}
 
 
-cloudinary.config(
-  cloud_name = str(os.getenv('CLOUD_NAME')),
-  api_key = str(os.getenv('CLOUD_KEY')),
-  api_secret = str(os.getenv('CLOUD_SECRET')),
-  secure = True
-)
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+
+
+# Django channel Layer
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
