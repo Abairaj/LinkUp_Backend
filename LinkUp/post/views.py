@@ -15,25 +15,6 @@ from django.conf import settings
 from .task import Compress_media
 
 
-<<<<<<< HEAD
-class PostAPIView(APIView):
-    pagination_class = PageNumberPagination
-
-    def get_object(self, user_id=None):
-        try:
-            User = user.objects.get(pk=user_id)
-            return User
-        except:
-            return Response(stateus=status.HTTP_404_NOT_FOUND)
-
-    def get(self, request):
-        paginator = self.pagination_class()
-        posts = Post.objects.select_related('user').order_by('-created_at')
-        paginated_posts = paginator.paginate_queryset(posts, request)
-        serializer = GETPostSerializers(paginated_posts, many=True)
-        print(paginated_posts, '//////////////')
-        return paginator.get_paginated_response(serializer.data)
-=======
 class PostPagination(PageNumberPagination):
     page_size = 10
     page_size_query_param = 'page_size'
@@ -61,7 +42,6 @@ class PostByIdApiView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response({"message": "no post yet"}, status=status.HTTP_404_NOT_FOUND)
->>>>>>> Chat
 
 
 class Create_Post_API_VIEW(APIView):
@@ -74,8 +54,6 @@ class Create_Post_API_VIEW(APIView):
         serializer.save()
         return Response(status=status.HTTP_200_OK)
 
-<<<<<<< HEAD
-=======
     def patch(self, request, user_id):
         try:
             post = Post.objects.get(post_id=user_id)
@@ -84,9 +62,8 @@ class Create_Post_API_VIEW(APIView):
         post.deleted = True
         post.save()
         print(post.deleted)
-        return Response({"message":"Post deleted successfully"},status=status.HTTP_304_NOT_MODIFIED)
+        return Response({"message": "Post deleted successfully"}, status=status.HTTP_304_NOT_MODIFIED)
 
->>>>>>> Chat
 
 class Reels_API_VIEW(APIView):
     def get(self, request):

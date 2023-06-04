@@ -18,7 +18,7 @@ from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
 
 
 class AuthCheckAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get(self, request, id):
         try:
@@ -88,7 +88,7 @@ class UserLoginAPIView(TokenObtainPairView):
 
 
 class UserProfileAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get_object(self, pk):
         try:
@@ -120,12 +120,6 @@ class UserProfileAPIView(APIView):
 
 class UserFollowView(APIView):
     permission_classes = [IsAuthenticated]
-<<<<<<< HEAD
-=======
-
-    def get(self, request, user_id):
-        pass
->>>>>>> Chat
 
     def post(self, request, user_id):
         print(user_id,'lllllllllllll')

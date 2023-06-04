@@ -38,14 +38,11 @@ def compressing_image(image, image_name):
     print('Image compressed')
 
     return new_image
-<<<<<<< HEAD
+
+
 # def compressing_videos(video_file):
 #     file_path = video_file.temporary_file_path()
-=======
 
-def compressing_videos(video_file):
-    file_path = video_file.temporary_file_path()
->>>>>>> Chat
 
 #     # Generate the output file path
 #     output_file = os.path.splitext(video_file.name)[0] + "_compressed.mp4"

@@ -50,7 +50,7 @@ INSTALLED_APPS = [
     'custom_admin',
     'post',
     'report',
-    'chat'
+    'chat',
 ]
 SITE_ID = 1
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -93,7 +93,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'LinkUp.wsgi.application'
-ASGI_APPLICATION = 'LinkUp.asgi.application'
 
 
 # Database
@@ -160,26 +159,20 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': [
-        'django_filters.rest_framework.DjangoFilterBackend'
+        'django_filters.rest_framework.DjangoFilterBackend',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 15,
 }
 
-<<<<<<< HEAD
+
 # pagination
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 15
-=======
-    ),
-    'DEFAULT_PAGINATION_CLASS':
-    'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10
-
-
->>>>>>> Chat
 }
 
 
@@ -255,11 +248,6 @@ SOCIALACCOUNT_PROVIDERS = {
 
 SOCIALACCOUNT_QUERY_EMAIL = True
 
-<<<<<<< HEAD
-=======
-
-
->>>>>>> Chat
 
 # # Celery configuration
 # CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//'  # RabbitMQ message broker URL
@@ -281,32 +269,9 @@ CELERY_RESULT_BACKEND = 'rpc://'  # Store Celery results in the Django database
 # }
 
 
-<<<<<<< HEAD
-=======
-# cloudinary
->>>>>>> Chat
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': str(os.getenv('CLOUD_NAME')),
     'API_KEY': str(os.getenv('CLOUD_KEY')),
     'API_SECRET': str(os.getenv('CLOUD_SECRET')),
 }
-<<<<<<< HEAD
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-=======
-
-
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-
-
-
-# Django channel Layer
-
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels.layers.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
-        },
-    },
-}
->>>>>>> Chat
