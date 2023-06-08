@@ -25,7 +25,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def disconnect(self,close_code):
         # close connection
         pass
-
+#chenged....................................................................
     def receive(self,text_data):
         # incoming messages
         pass
