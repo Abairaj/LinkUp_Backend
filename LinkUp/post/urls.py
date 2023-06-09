@@ -6,7 +6,7 @@ from . import views
 
 urlpatterns = [
 # user posts
-    path('all_posts/',views.PostAPIView.as_view(),name='post'),
+    path('posts/<user_id>',views.PostAPIView.as_view(),name='post'),
     path('create_post/<int:user_id>',views.Create_Post_API_VIEW.as_view(),name='create_post'),
     path('reels/',views.Reels_API_VIEW.as_view(),name='getpost'),
 

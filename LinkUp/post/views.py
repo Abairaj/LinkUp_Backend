@@ -13,24 +13,68 @@ from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.conf import settings
 from .task import Compress_media
+from django.shortcuts import get_object_or_404
+
+
+
+def get_post_of_following(user_id):
+    try:
+        usr = get_object_or_404(user, id=user_id)
+    except user.DoesNotExist:
+        return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    posts = Post.objects.filter(user__in=usr.following.all())
+    return posts
+
+
+def infinite_scroll_filter(request, user_id=None):
+    limit = request.GET.get('limit')
+    offset = request.GET.get('offset')
+
+
+    limit = int(limit)
+    offset = int(offset)
+    following_post = get_post_of_following(user_id)
+
+    try:
+        filter = request.GET.get('filter')
+    except:
+        filter = False
+    if filter:
+        if filter == 'home':
+            post = following_post.exclude(deleted=True).select_related(
+                'user').order_by('-created_at')
+            posts = post[offset:offset+limit]
+            
+            print(limit, offset,post.count(),posts,post, '[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]')
+
+            postCount = post.count()
+        elif filter == 'reels':
+            post = following_post.exclude(deleted=True).filter(media_type = 'Video').select_related(
+                'user').order_by('-created_at')
+            posts = post[offset:offset+limit]
+
+            postCount = post.count()
+           
+        elif filter == 'all':
+            post = Post.objects.exclude(deleted = True).order_by('-created_at')
+            posts = post[offset:offset+limit]
+            postCount = post.count()
+           
+    return {'posts': posts, 'postCount': postCount}
+
+
+class PostAPIView(APIView):
+
+    def get(self, request, user_id=None):
+        posts = infinite_scroll_filter(request, user_id)
+        serializer = GETPostSerializers(posts['posts'], many=True)
+        return Response({'post':serializer.data,'postCount':posts['postCount']}, status=status.HTTP_200_OK)
 
 
 class PostPagination(PageNumberPagination):
     page_size = 10
     page_size_query_param = 'page_size'
-
-
-class PostAPIView(APIView):
-    pagination_class = PostPagination
-
-    def get(self, request):
-        paginator = self.pagination_class()
-        posts = Post.objects.exclude(deleted=True).select_related(
-            'user').order_by('-created_at')
-        paginated_posts = paginator.paginate_queryset(posts, request)
-
-        serializer = GETPostSerializers(paginated_posts, many=True)
-        return paginator.get_paginated_response(serializer.data)
 
 
 class PostByIdApiView(APIView):
