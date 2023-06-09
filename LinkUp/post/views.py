@@ -16,7 +16,6 @@ from .task import Compress_media
 from django.shortcuts import get_object_or_404
 
 
-
 def get_post_of_following(user_id):
     try:
         usr = get_object_or_404(user, id=user_id)
@@ -31,7 +30,6 @@ def infinite_scroll_filter(request, user_id=None):
     limit = request.GET.get('limit')
     offset = request.GET.get('offset')
 
-
     limit = int(limit)
     offset = int(offset)
     following_post = get_post_of_following(user_id)
@@ -45,22 +43,20 @@ def infinite_scroll_filter(request, user_id=None):
             post = following_post.exclude(deleted=True).select_related(
                 'user').order_by('-created_at')
             posts = post[offset:offset+limit]
-            
-            print(limit, offset,post.count(),posts,post, '[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]')
 
             postCount = post.count()
         elif filter == 'reels':
-            post = following_post.exclude(deleted=True).filter(media_type = 'Video').select_related(
+            post = following_post.exclude(deleted=True).filter(media_type='Video').select_related(
                 'user').order_by('-created_at')
             posts = post[offset:offset+limit]
 
             postCount = post.count()
-           
+
         elif filter == 'all':
-            post = Post.objects.exclude(deleted = True).order_by('-created_at')
+            post = Post.objects.exclude(deleted=True).order_by('-created_at')
             posts = post[offset:offset+limit]
             postCount = post.count()
-           
+
     return {'posts': posts, 'postCount': postCount}
 
 
@@ -69,12 +65,7 @@ class PostAPIView(APIView):
     def get(self, request, user_id=None):
         posts = infinite_scroll_filter(request, user_id)
         serializer = GETPostSerializers(posts['posts'], many=True)
-        return Response({'post':serializer.data,'postCount':posts['postCount']}, status=status.HTTP_200_OK)
-
-
-class PostPagination(PageNumberPagination):
-    page_size = 10
-    page_size_query_param = 'page_size'
+        return Response({'post': serializer.data, 'postCount': posts['postCount']}, status=status.HTTP_200_OK)
 
 
 class PostByIdApiView(APIView):
@@ -94,7 +85,6 @@ class Create_Post_API_VIEW(APIView):
         serializer = PostSerializers(data=request.data)
         print(request.data)
         serializer.is_valid(raise_exception=True)
-        print('////////////////////////////////////////////////////////////////////////////////')
         serializer.save()
         return Response(status=status.HTTP_200_OK)
 
@@ -107,19 +97,6 @@ class Create_Post_API_VIEW(APIView):
         post.save()
         print(post.deleted)
         return Response({"message": "Post deleted successfully"}, status=status.HTTP_304_NOT_MODIFIED)
-
-
-class Reels_API_VIEW(APIView):
-    def get(self, request):
-
-        post = Post.objects.filter(deleted=False).select_related('user').filter(
-            media_type="Video").order_by("-created_at")
-
-        if post:
-            serializer = GETPostSerializers(post, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response({"message": "Post does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
 
 class Post_Like_Unlike_APIView(APIView):
@@ -162,20 +139,13 @@ class Post_Comment(APIView):
         print(post_id)
         comments = Comment.objects.select_related(
             'user').filter(post=post_id).order_by('created_at')
-        print(comments, 'dddd/////////////////')
-
-        # pagination for comments
-        # paginator = Comment_pagination()
-        # paginated_comments = paginator.paginate_queryset(comments,request)
 
         if comments:
-            print('2,////////////////////////')
             serializer = GetCommentSerializer(comments, many=True)
             # response = paginator.get_paginated_response(serializer.data)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         else:
-            print('3,/////////////////////////////')
             return Response({"message": "No comments yet"}, status=status.HTTP_404_NOT_FOUND)
 
     def post(self, request):

@@ -8,12 +8,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from .serializers import AdminLoginSerializer, UserListSerializer
 from django.contrib.auth import authenticate, login, logout
 from users.models import user
-from rest_framework.permissions import BasePermission
-
-
-class IsAdmin(BasePermission):
-    def has_permission(self, request, view):
-        return request.user and request.user.is_authenticate and request.user.is_superuser
+from .helper import IsAdmin
 
 class AdminLoginAPIView(TokenObtainPairView):
     permission_classes = [AllowAny]
