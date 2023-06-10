@@ -12,8 +12,9 @@ from .serializers import PostSerializers, GETPostSerializers, LikeSerializer, Co
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.conf import settings
-from .task import Compress_media
 from django.shortcuts import get_object_or_404
+from.helper import image_to_json
+from .task import Post_Save
 
 
 def get_post_of_following(user_id):
@@ -85,8 +86,21 @@ class Create_Post_API_VIEW(APIView):
         serializer = PostSerializers(data=request.data)
         print(request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(status=status.HTTP_200_OK)
+
+        media_file = serializer.validated_data['media_url']
+        media_type = serializer.validated_data['media_type']
+        caption = serializer.validated_data.get('caption')
+        media_file = image_to_json(media_file)
+        Post_Save.delay(media_file=media_file)
+        return Response({'message':"task accepted post will be created soon"},status=status.HTTP_200_OK)
+
+
+    # def post(self, request, user_id):
+    #     serializer = PostSerializers(data=request.data)
+    #     print(request.data)
+    #     serializer.is_valid(raise_exception=True)
+    #     serializer.save()
+    #     return Response(status=status.HTTP_200_OK)
 
     def patch(self, request, user_id):
         try:

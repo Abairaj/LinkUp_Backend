@@ -5,6 +5,58 @@ import os
 from moviepy.editor import VideoFileClip
 
 
+import base64
+import json
+import tempfile
+
+import time
+import random
+import string
+
+def generate_unique_filename():
+    timestamp = str(int(time.time()))  # Get the current timestamp
+    random_string = ''.join(random.choices(string.ascii_lowercase, k=6))  # Generate a random string of length 6
+    filename = f"{timestamp}_{random_string}.jpg"  # Combine timestamp, random string, and file extension
+
+    return filename
+save_directory = tempfile.mkdtemp()
+
+
+
+def image_to_json(image_file):
+    try:
+        with open(image_file.path, 'rb') as file:
+            encoded_image = base64.b64encode(file.read()).decode('utf-8')
+
+        json_data = json.dumps({'image': encoded_image})
+        return json_data
+    except Exception as e:
+        print(f"Error converting image to JSON: {str(e)}")
+        return None
+
+
+
+def json_to_image(json_data):
+    try:
+        decoded_image = base64.b64decode(json_data['image'])
+
+        # Generate a unique file name
+        file_name = generate_unique_filename()
+
+        # Create the image path
+        image_path = os.path.join(save_directory, file_name)
+
+        # Save the image file
+        with open(image_path, 'wb') as image_file:
+            image_file.write(decoded_image)
+
+        return image_path
+    except Exception as e:
+        print(f"Error converting JSON to image: {str(e)}")
+        return None
+
+
+
 def compressing_image(image, image_name):
     # Open the image using Pillow
     img = Image.open(image)
