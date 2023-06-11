@@ -94,6 +94,8 @@ class Create_Post_API_VIEW(APIView):
         Post_Save.delay(media_file=media_file)
         return Response({'message':"task accepted post will be created soon"},status=status.HTTP_200_OK)
 
+# https://stackoverflow.com/questions/71116738/how-to-use-celery-to-upload-files-in-django   check it
+
 
     # def post(self, request, user_id):
     #     serializer = PostSerializers(data=request.data)
