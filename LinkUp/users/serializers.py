@@ -29,7 +29,10 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = "__all__"
-
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = user
+        fields = '__all__'
 
 class UserProfileSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()
@@ -73,11 +76,10 @@ class UserUnfollowSerializer(serializers.ModelSerializer):
 
     def validate_user_id(self, user_id):
         try:
-            User = user.objects.get(id=value)
+            User = user.objects.get(id=user_id)
             print(User, 'kkkkkkkkkkkkkkkkkkkkkkkkkkkkkk')
         except User.DoesNotExist:
             raise serializers.ValidationError("Invalid user ID")
-        print(validated_data, 'kkkkkkkkkkkkkkkkkkkkkkkkk')
 
         return user
 
@@ -85,3 +87,23 @@ class UserUnfollowSerializer(serializers.ModelSerializer):
         user_to_unfollow = validated_data['user_id']
         instance.followers.remove(user_to_unfollow)
         return instance
+
+
+class UserProfileSerializerForChat(serializers.ModelSerializer):
+    id = serializers.IntegerField()
+    email = serializers.EmailField()
+    username = serializers.CharField()
+    full_name = serializers.CharField()
+    profile = serializers.ImageField(required=False)
+    gender = serializers.CharField(allow_blank=True)
+    phone = serializers.RegexField(regex=r'^\d{10}$')
+    bio = serializers.CharField(allow_blank=True)
+    followers = UserSerializer(many=True)
+    following = UserSerializer(many=True)
+    created_at = serializers.DateTimeField(read_only=True)
+    last_login = serializers.DateTimeField(read_only=True)
+
+    class Meta:
+        model = user
+        fields = ('id', 'email', 'username', 'full_name', 'profile', 'gender',
+                  'phone', 'bio', 'followers','following', 'created_at', 'last_login')

@@ -2,6 +2,10 @@ from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 import json
 from .models import user
+from chat.models import Notifications
+from chat.models import Message
+from asgiref.sync import sync_to_async
+
 
 
 class UserConsumer(AsyncWebsocketConsumer):
@@ -18,6 +22,27 @@ class UserConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def get_user(self, user_id):
         return user.objects.get(id=user_id)
+    
+    async def add_notification(self, data):
+        sender = await self.get_user(data['from']) # Await the coroutine to get the User instance
+        receiver = await self.get_user(data['to'])  # Await the coroutine to get the User instance
+        notification = data['content']
+        type_ = data['type']
+
+        
+        await sync_to_async(Notifications.objects.create)(sender=sender, receiver=receiver, notification=notification,type=type_)
+        print('notification created')
+
+    
+    async def add_chat(self, data):
+        sender = await self.get_user(data['from']) # Await the coroutine to get the User instance
+        recipient = await self.get_user(data['to'])  # Await the coroutine to get the User instance
+        print(sender,recipient,'>>>>>>>>>>>>>>>>>>>>>')
+        content = data['content']
+        
+        await sync_to_async(Message.objects.create)(sender=sender, recipient=recipient, content=content)
+        print('message created')
+      
 
     async def receive(self, text_data=None, bytes_data=None):
         print('......................................')
@@ -26,6 +51,36 @@ class UserConsumer(AsyncWebsocketConsumer):
             event = text_data_json.get('event')
 
             print(text_data, ';;;;;;;;;;;;')
+
+            if event == 'notification':
+                print('000000000000000000000000')
+                to = text_data_json.get('to')
+                frm = text_data_json.get('from')
+                content = text_data_json.get('content')
+                type_ = text_data_json.get('type')
+                data = {
+                    'to':to,
+                    'from':frm,
+                    'content':content,
+                    'type':type_
+                }
+
+                await self.add_notification(data)
+
+                user_instance = await self.get_user(to)
+                room_group_name = f'{user_instance.phone}{user_instance.id}'
+                await self.channel_layer.group_send(
+                    room_group_name,
+                    {
+                        'type': 'notification',
+                        'message': {
+                            'event': 'notification',
+                            'content': content,
+                            'from': frm,
+
+                        }
+                    }
+                )
 
             if event == 'join:room':
                 rec_user_id = text_data_json.get('rec_user_id')
@@ -40,6 +95,7 @@ class UserConsumer(AsyncWebsocketConsumer):
                         'message': {
                             'event': 'join_room',
                             'user_id': sender_user_id,
+                            'rec_id': rec_user_id,
                             'email': email,
                         }
                     }
@@ -51,7 +107,6 @@ class UserConsumer(AsyncWebsocketConsumer):
                 frm = text_data_json.get('from')
                 offer = text_data_json.get('offer')
 
-
                 user_instance = await self.get_user(to)
                 room_group_name = f'{user_instance.phone}{user_instance.id}'
                 await self.channel_layer.group_send(
@@ -61,8 +116,8 @@ class UserConsumer(AsyncWebsocketConsumer):
                         'message': {
                             'event': 'incoming_call',
                             'offer': offer,
-                            'from':frm,
-                            
+                            'from': frm,
+
                         }
                     }
                 )
@@ -100,7 +155,7 @@ class UserConsumer(AsyncWebsocketConsumer):
                         'message': {
                             'event': 'negotiationneeded',
                             'offer': offer,
-                            'from':frm
+                            'from': frm
 
                         }
                     }
@@ -118,7 +173,27 @@ class UserConsumer(AsyncWebsocketConsumer):
                         'type': 'nego_done',
                         'message': {
                             'event': 'nego_done',
-                            'answer':answer,
+                            'answer': answer,
+                        }
+                    }
+                )
+
+            if event == 'chat':
+                message = text_data_json.get('message')
+                to = text_data_json.get('to')
+                frm = text_data_json.get('from')
+                data = {'from':frm,'to':to,'content':message}
+                await self.add_chat(data)
+                print('chating......')
+                user_instance = await self.get_user(to)
+                room_group_name = f'{user_instance.phone}{user_instance.id}'
+                await self.channel_layer.group_send(
+                    room_group_name,
+                    {
+                        'type': 'chat',
+                        'message': {
+                            'event': 'chatmessage',
+                            'content': message,
                         }
                     }
                 )
@@ -143,3 +218,12 @@ class UserConsumer(AsyncWebsocketConsumer):
         message = event.get('message')
         await self.send(text_data=json.dumps({'message': message}))
 
+    async def chat(self, event):
+        print(event, '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+        message = event.get('message')
+        await self.send(text_data=json.dumps({'message': message}))
+
+    async def notification(self, event):
+        print(event, '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+        message = event.get('message')
+        await self.send(text_data=json.dumps({'message': message}))

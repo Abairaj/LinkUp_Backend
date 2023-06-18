@@ -8,7 +8,12 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from .serializers import AdminLoginSerializer, UserListSerializer
 from django.contrib.auth import authenticate, login, logout
 from users.models import user
+from post.models import Post
 from .helper import IsAdmin
+from datetime import datetime, timedelta
+from django.db.models import Count
+from django.db.models.functions import TruncDay
+
 
 class AdminLoginAPIView(TokenObtainPairView):
     permission_classes = [AllowAny]
@@ -33,7 +38,7 @@ class AdminLoginAPIView(TokenObtainPairView):
 
 
 class AdminUsersAPIView(APIView):
-    permission_classes = [IsAdmin]
+    # permission_classes = [IsAdmin]
 
     def get(self, request):
         try:
@@ -61,3 +66,29 @@ class AdminUsersAPIView(APIView):
                     return Response({'message':"user unbanned successfully"})
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+class AdminDashboardData(APIView):
+    def get(self, request):
+        today = datetime.now().date()
+        start_date = today - timedelta(days=30)  # Retrieve data for the last 30 days
+
+        user_count = user.objects.exclude(is_superuser=True).count()
+
+        user_per_day = user.objects.annotate(day=TruncDay('created_at')).filter(created_at__date__gte=start_date).values('day').annotate(registrations=Count('id')).values('day', 'registrations').order_by('day')
+
+        post_count = Post.objects.all().count()
+
+        delete_post_count = Post.objects.filter(deleted=True).count()
+
+        user_per_day_data = []
+        for item in user_per_day:
+            day = item['day'].strftime('%Y-%m-%d')
+            registrations = item['registrations']
+            user_per_day_data.append({'day': day, 'registrations': registrations})
+
+        return Response(data={"user_count": user_count, "user_per_day": user_per_day_data,'post_count':post_count,'deleted_post_count':delete_post_count})
+    

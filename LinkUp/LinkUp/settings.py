@@ -52,6 +52,8 @@ INSTALLED_APPS = [
     'post',
     'report',
     'chat',
+    'storages',
+
 ]
 SITE_ID = 1
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -148,6 +150,26 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
+
+
+
+# # AWS S3 Configuration
+# AWS_ACCESS_KEY_ID = str(os.getenv('AWS_ACCESS_KEY_ID'))
+# AWS_SECRET_ACCESS_KEY =str(os.getenv('AWS_SECRET_ACCESS_KEY'))
+# AWS_STORAGE_BUCKET_NAME = str(os.getenv('AWS_STORAGE_BUCKET_NAME')) 
+
+# # Your app endpoint
+# AWS_S3_ENDPOINT_URL =  str(os.getenv('AWS_S3_ENDPOINT_URL'))
+
+# # Only public read for now
+# AWS_QUERYSTRING_AUTH = False
+# AWS_DEFAULT_ACL='public-read'
+
+# # 
+
+
+
+
 
 STATIC_URL = 'static/'
 
@@ -275,12 +297,12 @@ CLOUDINARY_STORAGE = {
 }
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
-
 # CHANNEL_LAYERS = {
 #     'default': {
 #         'BACKEND': 'channels.layers.InMemoryChannelLayer',
 #     },
 # }
+
 
 
 CHANNEL_LAYERS = {

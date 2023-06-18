@@ -1,5 +1,7 @@
 from django.db import models
 from users.models import user
+from cloudinary_storage.storage import VideoMediaCloudinaryStorage
+# from cloudinary_storage.validators import validate_video
 
 
 class Post(models.Model):
@@ -14,7 +16,9 @@ class Post(models.Model):
     user = models.ForeignKey(user, on_delete=models.CASCADE)
     caption = models.TextField(blank=True, null=True)
     media_type = models.CharField(max_length=10, choices=MEDIA_CHOICES)
-    media_url = models.FileField(upload_to='post')
+    # media_url = models.FileField(upload_to='post')
+    image = models.ImageField(upload_to='post/image',blank=True)
+    video = models.FileField(upload_to='post/videos',blank=True, storage=VideoMediaCloudinaryStorage())
     created_at = models.DateTimeField(auto_now=True)
     deleted = models.BooleanField(default=False)
 

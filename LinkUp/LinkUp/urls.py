@@ -20,7 +20,7 @@ urlpatterns = [
     path('socialauth/', include('socialauth.urls')),
     path('post/', include('post.urls')),
     path('report/', include('report.urls')),
-    # path('chats/', include('chat.routing')),
+    path('chats/', include('chat.urls')),
 
 
 

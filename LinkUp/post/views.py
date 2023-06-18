@@ -15,7 +15,7 @@ from django.conf import settings
 from django.shortcuts import get_object_or_404
 from.helper import image_to_json
 from .task import Post_Save
-
+import base64
 
 def get_post_of_following(user_id):
     try:
@@ -85,13 +85,35 @@ class Create_Post_API_VIEW(APIView):
     def post(self, request, user_id):
         serializer = PostSerializers(data=request.data)
         print(request.data)
-        serializer.is_valid(raise_exception=True)
+        if serializer.is_valid():
+            # media_file = serializer.validated_data['image']
+            # file_path = default_storage.save('temp/' + media_file.name, media_file)
+            # Post_Save.delay(file_path)
+            serializer.save()
+        else:
+            print(serializer.errors)
 
-        media_file = serializer.validated_data['media_url']
-        media_type = serializer.validated_data['media_type']
-        caption = serializer.validated_data.get('caption')
-        media_file = image_to_json(media_file)
-        Post_Save.delay(media_file=media_file)
+        # media_file = request.data['media_url']
+        # media_type = request.data['media_type']
+        # caption = request.data.get('caption')
+        # image = media_file.read()
+        # byte = base64.b64encode(image)
+
+
+                
+        # data = {
+        #     'user':user_id,
+        #     'caption': caption,
+        #     'image': byte.decode('utf-8'),
+        #     "media_type": media_type,
+        #     "image_name": media_file.name
+        # }
+
+        # print(data,'lllllllllll')
+
+        # Post_Save.delay(data)
+
+
         return Response({'message':"task accepted post will be created soon"},status=status.HTTP_200_OK)
 
 # https://stackoverflow.com/questions/71116738/how-to-use-celery-to-upload-files-in-django   check it
@@ -139,14 +161,14 @@ class Post_Like_Unlike_APIView(APIView):
 
         if user_obj in post.likes.all():
             post.likes.remove(user_obj)
-            message = 'Post Unliked'
+            message = {'liked':False}
         else:
             post.likes.add(user_obj)
-            message = 'Post Liked'
+            message = {'liked':True}
 
         # Serialize the updated post object
         serializer = PostSerializers(post)
-        return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+        return Response({'message':message,'data':serializer.data}, status=status.HTTP_201_CREATED)
 
 
 class Post_Comment(APIView):
