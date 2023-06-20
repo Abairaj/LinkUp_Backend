@@ -54,6 +54,8 @@ class user(AbstractUser):
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
+    is_verified = models.BooleanField(default=False)
+    otp = models.IntegerField(blank=True,null=True)
 
     REQUIRED_FIELDS = ['username']
     USERNAME_FIELD = 'email'

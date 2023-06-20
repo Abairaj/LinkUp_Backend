@@ -16,6 +16,8 @@ from .serializers import (
 from django.contrib.auth import authenticate, login, logout
 from .models import user
 from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
+from random import randint
+from report.task import send_email
 
 
 class AuthCheckAPIView(APIView):
@@ -58,12 +60,37 @@ class UserRegistrationAPIView(APIView):
         if serializer.is_valid():
             User = serializer.save()
             if User:
-                message = {'message': "User registered successfully"}
-                return Response(message, status=status.HTTP_201_CREATED)
+                otp = randint(1000,9999)
+                subject = 'OTP VERIFICATION'
+                content = f'YOUR ONE TIME OTP FOR LinkUp is {otp}'
+                receiver_mail = email
+                sender_mail = 'arkclickscm@gmail.com'
+                send_email.delay(subject,content,sender_mail,receiver_mail)
+                User.otp = otp
+                
+                message = {'message': "OTP sent to the email"}
+                return Response(message, status=status.HTTP_200_OK)
         else:
             print(serializer.errors)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
+class OTP_Verification_view(APIView):
+    def post(self,request):
+        print(';;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;')
+        email = request.data.get('email')
+        otp = request.data.get('otp')
+
+        usr = user.objects.get(email = email)
+        print(usr.otp,otp,';;;;;;;;;;;;;')
+
+        if usr.otp == otp:
+            usr.is_verified = True
+            usr.save()
+            del usr.otp
+            return Response('user_verified successfully',status=status.HTTP_200_OK)
+        else:
+            usr.delete()
+            return Response({'message':'You have entered the wrong otp try again'},status=status.HTTP_404_NOT_FOUND)
 
 class UserLoginAPIView(TokenObtainPairView):
 
