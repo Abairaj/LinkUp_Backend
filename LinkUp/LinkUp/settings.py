@@ -153,20 +153,6 @@ USE_TZ = True
 
 
 
-# # AWS S3 Configuration
-# AWS_ACCESS_KEY_ID = str(os.getenv('AWS_ACCESS_KEY_ID'))
-# AWS_SECRET_ACCESS_KEY =str(os.getenv('AWS_SECRET_ACCESS_KEY'))
-# AWS_STORAGE_BUCKET_NAME = str(os.getenv('AWS_STORAGE_BUCKET_NAME')) 
-
-# # Your app endpoint
-# AWS_S3_ENDPOINT_URL =  str(os.getenv('AWS_S3_ENDPOINT_URL'))
-
-# # Only public read for now
-# AWS_QUERYSTRING_AUTH = False
-# AWS_DEFAULT_ACL='public-read'
-
-# # 
-
 
 
 
@@ -248,28 +234,28 @@ SIMPLE_JWT = {
 }
 
 
-CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_ALLOW_ALL = True
 
 # CORS_ORIGIN_WHITELIST = [
 #     'https://sociallinkup.netlify.app',
 # ]
 
 
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:5173",
-#     "http://127.0.0.1:5173",
+CORS_ALLOWED_ORIGINS = [
+    # "http://localhost:5173",
+    # "http://127.0.0.1:5173",
 
+]
+
+# CORS_ORIGIN_WHITELIST = [
+#     'https://sociallinkup.netlify.app',
 # ]
 
-CORS_ORIGIN_WHITELIST = [
-    'https://sociallinkup.netlify.app',
-]
-
-CORS_ALLOW_METHODS = [
-    'GET',
-    'POST',
-    'OPTIONS',
-]
+# CORS_ALLOW_METHODS = [
+#     'GET',
+#     'POST',
+#     'OPTIONS',
+# ]
 
 
 
