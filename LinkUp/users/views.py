@@ -73,9 +73,9 @@ class UserRegistrationAPIView(APIView):
                 
                 message = {'message': "OTP sent to the email"}
                 return Response(message, status=status.HTTP_200_OK)
-        else:
-            print(serializer.errors)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        # else:
+        #     print(serializer.errors)
+        # return Response(status=status.HTTP_400_BAD_REQUEST)
 
 class OTP_Verification_view(APIView):
     def post(self,request):

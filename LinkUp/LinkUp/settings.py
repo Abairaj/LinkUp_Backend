@@ -19,7 +19,7 @@ SECRET_KEY = str(os.getenv('SECRET_KEY'))
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -248,11 +248,29 @@ SIMPLE_JWT = {
 }
 
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
+CORS_ORIGIN_ALLOW_ALL = False
 
+# CORS_ORIGIN_WHITELIST = [
+#     'https://sociallinkup.netlify.app',
+# ]
+
+
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:5173",
+#     "http://127.0.0.1:5173",
+
+# ]
+
+CORS_ORIGIN_WHITELIST = [
+    'https://sociallinkup.netlify.app',
 ]
+
+CORS_ALLOW_METHODS = [
+    'GET',
+    'POST',
+    'OPTIONS',
+]
+
 
 
 SOCIALACCOUNT_PROVIDERS = {
