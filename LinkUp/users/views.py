@@ -59,6 +59,9 @@ class UserRegistrationAPIView(APIView):
 
         if serializer.is_valid():
             User = serializer.save()
+            message = {'message': "OTP sent to the email"}
+            return Response(message, status=status.HTTP_200_OK)
+
             if User:
                 otp = randint(1000,9999)
                 subject = 'OTP VERIFICATION'
