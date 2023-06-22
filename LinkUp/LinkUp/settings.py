@@ -152,11 +152,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 
-
-
-
-
-
 STATIC_URL = 'static/'
 
 
@@ -258,7 +253,6 @@ CORS_ALLOWED_ORIGINS = [
 # ]
 
 
-
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'SCOPE': [
@@ -306,7 +300,6 @@ DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 #         'BACKEND': 'channels.layers.InMemoryChannelLayer',
 #     },
 # }
-
 
 
 CHANNEL_LAYERS = {

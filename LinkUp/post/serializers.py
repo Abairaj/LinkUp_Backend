@@ -15,7 +15,6 @@ class PostSerializers(serializers.ModelSerializer):
         media_type = validated_data['media_type']
         usr = validated_data['user']
         # instance = super().create(validated_data)
-        print(media_type, '===================')
 
         if media_type == "Image":
             media_file = validated_data.pop('image')
@@ -23,7 +22,6 @@ class PostSerializers(serializers.ModelSerializer):
             instance = super().create(validated_data)
 
             compressed_image = compressing_image(media_file, image_name)
-            print(compressed_image, '/////////////////////////////')
             instance.image = compressed_image
             instance.save()
             return instance
@@ -35,10 +33,8 @@ class PostSerializers(serializers.ModelSerializer):
 
             compressed_video = media_file
             if compressed_video:
-                print(compressed_video, '////////////////////////////')
                 instance.video = compressed_video
                 instance.save()
-                print(instance, '[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]')
             return instance
 
 

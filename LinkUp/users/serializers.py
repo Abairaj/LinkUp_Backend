@@ -25,14 +25,18 @@ class UserLoginSerializer(serializers.ModelSerializer):
         model = user
         fields = ("email", "password")
 
+
 class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = "__all__"
+
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = user
         fields = '__all__'
+
 
 class UserProfileSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()
@@ -51,7 +55,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = user
         fields = ('id', 'email', 'username', 'full_name', 'profile', 'gender',
-                  'phone', 'bio', 'followers','following', 'created_at', 'last_login')
+                  'phone', 'bio', 'followers', 'following', 'created_at', 'last_login')
 
 
 class UserFollowSerializer(serializers.Serializer):
@@ -77,7 +81,6 @@ class UserUnfollowSerializer(serializers.ModelSerializer):
     def validate_user_id(self, user_id):
         try:
             User = user.objects.get(id=user_id)
-            print(User, 'kkkkkkkkkkkkkkkkkkkkkkkkkkkkkk')
         except User.DoesNotExist:
             raise serializers.ValidationError("Invalid user ID")
 
@@ -106,4 +109,4 @@ class UserProfileSerializerForChat(serializers.ModelSerializer):
     class Meta:
         model = user
         fields = ('id', 'email', 'username', 'full_name', 'profile', 'gender',
-                  'phone', 'bio', 'followers','following', 'created_at', 'last_login')
+                  'phone', 'bio', 'followers', 'following', 'created_at', 'last_login')

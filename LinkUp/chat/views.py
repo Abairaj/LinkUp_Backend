@@ -13,12 +13,10 @@ from django.db.models import Q
 class MessageAccessView(APIView):
     def get(self, request, rec_id, sen_id):
         try:
-            print('[[[[[[[[[[[[[[]]]]]]]]]]]]]]')
             message = Message.objects.filter(
                 (Q(sender=sen_id) & Q(recipient=rec_id)) | (
                     Q(sender=rec_id) & Q(recipient=sen_id))
             ).order_by('created_at')
-            print(message, 'lllllllllllllllllll')
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
 

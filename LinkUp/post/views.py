@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from .models import Post
 from rest_framework.views import APIView
 from rest_framework.pagination import PageNumberPagination
@@ -10,12 +9,9 @@ from users.models import user
 from .models import Post, Comment
 from .serializers import PostSerializers, GETPostSerializers, LikeSerializer, CommentSerializer, GetCommentSerializer
 from django.core.files.storage import default_storage
-from django.core.files.base import ContentFile
 from django.conf import settings
 from django.shortcuts import get_object_or_404
-from.helper import image_to_json
-from .task import Post_Save
-import base64
+
 
 def get_post_of_following(user_id):
     try:
@@ -86,38 +82,14 @@ class Create_Post_API_VIEW(APIView):
         serializer = PostSerializers(data=request.data)
         print(request.data)
         if serializer.is_valid():
-            # media_file = serializer.validated_data['image']
-            # file_path = default_storage.save('temp/' + media_file.name, media_file)
-            # Post_Save.delay(file_path)
             serializer.save()
+            return Response({'message':'post saved successfully'},status=status.HTTP_200_0K)
         else:
             print(serializer.errors)
 
-        # media_file = request.data['media_url']
-        # media_type = request.data['media_type']
-        # caption = request.data.get('caption')
-        # image = media_file.read()
-        # byte = base64.b64encode(image)
-
-
-                
-        # data = {
-        #     'user':user_id,
-        #     'caption': caption,
-        #     'image': byte.decode('utf-8'),
-        #     "media_type": media_type,
-        #     "image_name": media_file.name
-        # }
-
-        # print(data,'lllllllllll')
-
-        # Post_Save.delay(data)
-
-
-        return Response({'message':"task accepted post will be created soon"},status=status.HTTP_200_OK)
+        return Response({'message': "task accepted post will be created soon"}, status=status.HTTP_200_OK)
 
 # https://stackoverflow.com/questions/71116738/how-to-use-celery-to-upload-files-in-django   check it
-
 
     # def post(self, request, user_id):
     #     serializer = PostSerializers(data=request.data)
@@ -161,14 +133,14 @@ class Post_Like_Unlike_APIView(APIView):
 
         if user_obj in post.likes.all():
             post.likes.remove(user_obj)
-            message = {'liked':False}
+            message = {'liked': False}
         else:
             post.likes.add(user_obj)
-            message = {'liked':True}
+            message = {'liked': True}
 
         # Serialize the updated post object
         serializer = PostSerializers(post)
-        return Response({'message':message,'data':serializer.data}, status=status.HTTP_201_CREATED)
+        return Response({'message': message, 'data': serializer.data}, status=status.HTTP_201_CREATED)
 
 
 class Post_Comment(APIView):
@@ -180,7 +152,6 @@ class Post_Comment(APIView):
 
         if comments:
             serializer = GetCommentSerializer(comments, many=True)
-            # response = paginator.get_paginated_response(serializer.data)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         else:
@@ -210,10 +181,3 @@ class Post_Comment(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class test(APIView):
-    def post(rself, equest):
-        res = Compress_media.delay(media_file='file')
-        if not res.successful():
-            return Response("task done", status=status.HTTP_200_OK)
-
-        return Response(status=status.HTTP_200_OK)

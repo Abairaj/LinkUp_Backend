@@ -47,12 +47,9 @@ class DeletePost_Action(APIView):
             return Response({"message": "post does not exist"}, status=status.HTTP_404_NOT_FOUND)
         post.deleted = True
         post.save()
-        print(post.user.email,'llllllllllllllllllllllll')
         subject = 'LinkUp Post Deleted Due to Policy Violations'
         message = f'Dear user your post with postid {post_id} has been removed by the Admin due to the violation of the polices'
         sender_mail = 'arkclickscm@gmail.com'
         reciever_mail = post.user.email
-        send_email.delay(subject,message,sender_mail,reciever_mail)
+        send_email.delay(subject, message, sender_mail, reciever_mail)
         return Response(status=status.HTTP_304_NOT_MODIFIED)
-
-

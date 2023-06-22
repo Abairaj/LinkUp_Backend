@@ -9,7 +9,6 @@ GENDER_CHOICES = {
 }
 
 
-
 class UserManager(BaseUserManager):
     def create_user(self, email, password, username, **extra_fields):
         if not email:
@@ -47,15 +46,16 @@ class user(AbstractUser):
     bio = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField(blank=True, null=True)
-    followers = models.ManyToManyField('self',symmetrical=False,related_name='followings')
-    following = models.ManyToManyField('self',symmetrical=False)
+    followers = models.ManyToManyField(
+        'self', symmetrical=False, related_name='followings')
+    following = models.ManyToManyField('self', symmetrical=False)
     password = models.CharField(max_length=250)
     is_banned = models.BooleanField(default=False, blank=True, null=True)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
-    otp = models.IntegerField(blank=True,null=True)
+    otp = models.IntegerField(blank=True, null=True)
 
     REQUIRED_FIELDS = ['username']
     USERNAME_FIELD = 'email'

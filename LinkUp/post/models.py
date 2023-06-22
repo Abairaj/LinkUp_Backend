@@ -17,8 +17,9 @@ class Post(models.Model):
     caption = models.TextField(blank=True, null=True)
     media_type = models.CharField(max_length=10, choices=MEDIA_CHOICES)
     # media_url = models.FileField(upload_to='post')
-    image = models.ImageField(upload_to='post/image',blank=True)
-    video = models.FileField(upload_to='post/videos',blank=True, storage=VideoMediaCloudinaryStorage())
+    image = models.ImageField(upload_to='post/image', blank=True)
+    video = models.FileField(upload_to='post/videos',
+                             blank=True, storage=VideoMediaCloudinaryStorage())
     created_at = models.DateTimeField(auto_now=True)
     deleted = models.BooleanField(default=False)
 

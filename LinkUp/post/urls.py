@@ -22,7 +22,6 @@ urlpatterns = [
          views.Post_Comment.as_view(), name='Comment'),
 
 
-    path('test/', views.test.as_view(), name='test')
 
 
 ]

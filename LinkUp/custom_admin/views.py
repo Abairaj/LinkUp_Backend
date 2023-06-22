@@ -54,31 +54,31 @@ class AdminUsersAPIView(APIView):
             print(request.data['is_banned'])
 
         except user.DoesNotExist:
-            return Response({"error":"user does not exist"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "user does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
         if User:
-            serializer = UserListSerializer(instance=User,data=request.data, partial=True)
+            serializer = UserListSerializer(
+                instance=User, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
                 if User.is_banned == True:
-                    return Response({'message':"user banned successfully"})
+                    return Response({'message': "user banned successfully"})
                 elif User.is_banned == False:
-                    return Response({'message':"user unbanned successfully"})
+                    return Response({'message': "user unbanned successfully"})
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-
 
 
 class AdminDashboardData(APIView):
     def get(self, request):
         today = datetime.now().date()
-        start_date = today - timedelta(days=30)  # Retrieve data for the last 30 days
+        # Retrieve data for the last 30 days
+        start_date = today - timedelta(days=30)
 
         user_count = user.objects.exclude(is_superuser=True).count()
 
-        user_per_day = user.objects.annotate(day=TruncDay('created_at')).filter(created_at__date__gte=start_date).values('day').annotate(registrations=Count('id')).values('day', 'registrations').order_by('day')
+        user_per_day = user.objects.annotate(day=TruncDay('created_at')).filter(created_at__date__gte=start_date).values(
+            'day').annotate(registrations=Count('id')).values('day', 'registrations').order_by('day')
 
         post_count = Post.objects.all().count()
 
@@ -88,7 +88,7 @@ class AdminDashboardData(APIView):
         for item in user_per_day:
             day = item['day'].strftime('%Y-%m-%d')
             registrations = item['registrations']
-            user_per_day_data.append({'day': day, 'registrations': registrations})
+            user_per_day_data.append(
+                {'day': day, 'registrations': registrations})
 
-        return Response(data={"user_count": user_count, "user_per_day": user_per_day_data,'post_count':post_count,'deleted_post_count':delete_post_count})
-    
+        return Response(data={"user_count": user_count, "user_per_day": user_per_day_data, 'post_count': post_count, 'deleted_post_count': delete_post_count})

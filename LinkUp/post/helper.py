@@ -13,14 +13,18 @@ import time
 import random
 import string
 
+
 def generate_unique_filename():
     timestamp = str(int(time.time()))  # Get the current timestamp
-    random_string = ''.join(random.choices(string.ascii_lowercase, k=6))  # Generate a random string of length 6
-    filename = f"{timestamp}_{random_string}.jpg"  # Combine timestamp, random string, and file extension
+    # Generate a random string of length 6
+    random_string = ''.join(random.choices(string.ascii_lowercase, k=6))
+    # Combine timestamp, random string, and file extension
+    filename = f"{timestamp}_{random_string}.jpg"
 
     return filename
-save_directory = tempfile.mkdtemp()
 
+
+save_directory = tempfile.mkdtemp()
 
 
 def image_to_json(image_file):
@@ -33,7 +37,6 @@ def image_to_json(image_file):
     except Exception as e:
         print(f"Error converting image to JSON: {str(e)}")
         return None
-
 
 
 def json_to_image(json_data):
@@ -54,7 +57,6 @@ def json_to_image(json_data):
     except Exception as e:
         print(f"Error converting JSON to image: {str(e)}")
         return None
-
 
 
 def compressing_image(image, image_name):
@@ -95,7 +97,6 @@ def compressing_image(image, image_name):
 def compressing_videos(video_file):
     file_path = video_file.temporary_file_path()
 
-
     # Generate the output file path
     output_file = os.path.splitext(video_file.name)[0] + "_compressed.mp4"
 
@@ -114,13 +115,15 @@ def compressing_videos(video_file):
     cropped_clip = clip.crop(y1=y1, y2=y2)
 
     # Resize the video to the desired height for compression
-    compressed_clip = cropped_clip.resize(height=720)  # Set the desired height for compression
+    # Set the desired height for compression
+    compressed_clip = cropped_clip.resize(height=720)
 
     # Calculate the target bitrate to limit the output video size
     target_bitrate = 9000000  # 9 Mbps
 
     # Compress the video by reducing the bitrate and setting the output format
-    compressed_clip.write_videofile(output_file, bitrate=str(target_bitrate), codec="libx264", audio_codec="aac")
+    compressed_clip.write_videofile(output_file, bitrate=str(
+        target_bitrate), codec="libx264", audio_codec="aac")
 
     # Close the clips
     clip.close()

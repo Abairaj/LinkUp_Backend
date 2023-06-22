@@ -7,62 +7,55 @@ from chat.models import Message
 from asgiref.sync import sync_to_async
 
 
-
 class UserConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         user_id = self.scope['url_route']['kwargs']['user_id']
         user_instance = await self.get_user(user_id)
         room_name = user_instance.email
         room_group_name = f'{user_instance.phone}{user_instance.id}'
-        print(user_id, 'pppppppppppppppppppp')
         await self.channel_layer.group_add(room_group_name, self.channel_name)
-        print('accepted..............')
         await self.accept()
 
     @database_sync_to_async
     def get_user(self, user_id):
         return user.objects.get(id=user_id)
-    
+
     async def add_notification(self, data):
-        sender = await self.get_user(data['from']) # Await the coroutine to get the User instance
-        receiver = await self.get_user(data['to'])  # Await the coroutine to get the User instance
+        # Await the coroutine to get the User instance
+        sender = await self.get_user(data['from'])
+        # Await the coroutine to get the User instance
+        receiver = await self.get_user(data['to'])
         notification = data['content']
         type_ = data['type']
 
-        
-        await sync_to_async(Notifications.objects.create)(sender=sender, receiver=receiver, notification=notification,type=type_)
+        await sync_to_async(Notifications.objects.create)(sender=sender, receiver=receiver, notification=notification, type=type_)
         print('notification created')
 
-    
     async def add_chat(self, data):
-        sender = await self.get_user(data['from']) # Await the coroutine to get the User instance
-        recipient = await self.get_user(data['to'])  # Await the coroutine to get the User instance
-        print(sender,recipient,'>>>>>>>>>>>>>>>>>>>>>')
+        # Await the coroutine to get the User instance
+        sender = await self.get_user(data['from'])
+        # Await the coroutine to get the User instance
+        recipient = await self.get_user(data['to'])
         content = data['content']
-        
+
         await sync_to_async(Message.objects.create)(sender=sender, recipient=recipient, content=content)
         print('message created')
-      
 
     async def receive(self, text_data=None, bytes_data=None):
-        print('......................................')
         if text_data:
             text_data_json = json.loads(text_data)
             event = text_data_json.get('event')
 
-            print(text_data, ';;;;;;;;;;;;')
-
             if event == 'notification':
-                print('000000000000000000000000')
                 to = text_data_json.get('to')
                 frm = text_data_json.get('from')
                 content = text_data_json.get('content')
                 type_ = text_data_json.get('type')
                 data = {
-                    'to':to,
-                    'from':frm,
-                    'content':content,
-                    'type':type_
+                    'to': to,
+                    'from': frm,
+                    'content': content,
+                    'type': type_
                 }
 
                 await self.add_notification(data)
@@ -102,7 +95,6 @@ class UserConsumer(AsyncWebsocketConsumer):
                 )
 
             if event == 'call_user':
-                print('000000000000000000000000')
                 to = text_data_json.get('to')
                 frm = text_data_json.get('from')
                 offer = text_data_json.get('offer')
@@ -182,7 +174,7 @@ class UserConsumer(AsyncWebsocketConsumer):
                 message = text_data_json.get('message')
                 to = text_data_json.get('to')
                 frm = text_data_json.get('from')
-                data = {'from':frm,'to':to,'content':message}
+                data = {'from': frm, 'to': to, 'content': message}
                 await self.add_chat(data)
                 print('chating......')
                 user_instance = await self.get_user(to)
@@ -219,11 +211,9 @@ class UserConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({'message': message}))
 
     async def chat(self, event):
-        print(event, '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
         message = event.get('message')
         await self.send(text_data=json.dumps({'message': message}))
 
     async def notification(self, event):
-        print(event, '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
         message = event.get('message')
         await self.send(text_data=json.dumps({'message': message}))
