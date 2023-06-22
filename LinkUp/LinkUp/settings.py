@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "corsheaders",
     'rest_framework',
     'dj_rest_auth',
     'django.contrib.sites',
@@ -43,7 +44,6 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'allauth.socialaccount.providers.google',  # for Google OAuth 2.0
     'rest_framework_simplejwt',
-    "corsheaders",
     'celery',
     'cloudinary',
     'users',
@@ -229,7 +229,7 @@ SIMPLE_JWT = {
 }
 
 
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_ALL_ORIGINS = True
 
 # CORS_ORIGIN_WHITELIST = [
 #     'https://sociallinkup.netlify.app',
@@ -243,6 +243,15 @@ CORS_ALLOWED_ORIGINS = [
 
 
 ]
+
+
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://sociallinkup.netlify.app',
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
 
 # CORS_ORIGIN_WHITELIST = [
 #     'https://sociallinkup.netlify.app',
