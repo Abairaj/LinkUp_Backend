@@ -79,7 +79,6 @@ class UserRegistrationAPIView(APIView):
 
 class OTP_Verification_view(APIView):
     def post(self,request):
-        print(';;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;')
         email = request.data.get('email')
         otp = request.data.get('otp')
 
@@ -138,7 +137,6 @@ class UserProfileAPIView(APIView):
             # Access query parameter 'filter'
             filter_param = request.GET.get('filter')
             if filter_param == 'chat':
-                print(filter_param, 'ppppppppppppppppp')
                 serializer = UserProfileSerializerForChat(User)
             else:
                 serializer = UserProfileSerializer(User)
@@ -164,8 +162,6 @@ class UserFollowView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, user_id):
-        print(user_id, 'lllllllllllll')
-        print(request.data.get("user_id"), 'ddddddddddddddd')
         serializer = UserFollowSerializer(data=request.data)
         if serializer.is_valid():
             user_to_follow = serializer.validated_data['user_id']
@@ -194,11 +190,9 @@ class UserSearchView(APIView):
     def get(self, request):
         key = request.GET.get("key")
         if key:
-            print(key, '///////////////')
             try:
                 usr = user.objects.filter(username__startswith=key)
                 print(key)
-                print(usr, '////////////////////')
                 serializer = UserProfileSerializer(instance=usr, many=True)
                 return Response(serializer.data, status=status.HTTP_200_OK)
             except:
