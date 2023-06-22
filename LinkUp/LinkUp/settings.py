@@ -244,6 +244,14 @@ CORS_ALLOWED_ORIGINS = [
 
 ]
 
+CORS_ALLOW_METHODS = [
+    'GET',
+    'POST',
+    'PUT',
+    'PATCH',
+    'DELETE',
+    'OPTIONS',
+]
 
 
 CSRF_TRUSTED_ORIGINS = [
