@@ -1,3 +1,6 @@
+from .task import Post_Save
+import base64
+from django.http import JsonResponse
 from .models import Post
 from rest_framework.views import APIView
 from rest_framework.pagination import PageNumberPagination
@@ -83,11 +86,12 @@ class Create_Post_API_VIEW(APIView):
         print(request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response({'message':'post saved successfully'},status=status.HTTP_200_0K)
+            return Response({'message': 'post saved successfully'}, status=status.HTTP_200_OK)
         else:
             print(serializer.errors)
+            return Response({'message': 'some error occurred'}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({'message': "task accepted post will be created soon"}, status=status.HTTP_200_OK)
+        # return Response({'message': "task accepted post will be created soon"}, status=status.HTTP_200_OK)
 
 # https://stackoverflow.com/questions/71116738/how-to-use-celery-to-upload-files-in-django   check it
 
@@ -181,3 +185,10 @@ class Post_Comment(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+class ImageCeleryTest(APIView):
+    def post(self, request):
+        image = request.FILES.get('image')
+        image_data = base64.b64encode(image.read()).decode('utf-8')
+        print(image_data, '>>>>>>>>>>')
+        Post_Save.delay(image_data)
+        return Response('finished')

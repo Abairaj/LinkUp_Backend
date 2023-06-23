@@ -22,6 +22,9 @@ urlpatterns = [
          views.Post_Comment.as_view(), name='Comment'),
 
 
+    path('test/',
+         views.ImageCeleryTest.as_view(), name='imagetest'),
+
 
 
 ]

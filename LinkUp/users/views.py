@@ -222,3 +222,6 @@ class LogoutApiView(APIView):
     def post(self, request):
         logout(request)
         return Response({'message': "successfully logged out."}, status=status.HTTP_200_OK)
+
+
+
