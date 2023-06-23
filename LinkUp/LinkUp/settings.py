@@ -262,15 +262,7 @@ CSRF_TRUSTED_ORIGINS = [
 CORS_ALLOW_CREDENTIALS = True
 
 
-# CORS_ORIGIN_WHITELIST = [
-#     'https://sociallinkup.netlify.app',
-# ]
 
-# CORS_ALLOW_METHODS = [
-#     'GET',
-#     'POST',
-#     'OPTIONS',
-# ]
 
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -326,7 +318,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
+            'hosts': [('localhost', 6379)], 
         },
     },
 }
