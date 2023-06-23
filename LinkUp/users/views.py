@@ -60,39 +60,41 @@ class UserRegistrationAPIView(APIView):
         if serializer.is_valid():
             User = serializer.save()
             message = {'message': "OTP sent to the email"}
-            return Response(message, status=status.HTTP_200_OK)
+            # return Response(message, status=status.HTTP_200_OK)
 
             if User:
-                otp = randint(1000,9999)
+                otp = randint(1000, 9999)
                 subject = 'OTP VERIFICATION'
                 content = f'YOUR ONE TIME OTP FOR LinkUp is {otp}'
                 receiver_mail = email
                 sender_mail = 'arkclickscm@gmail.com'
-                send_email.delay(subject,content,sender_mail,receiver_mail)
+                send_email.delay(subject, content, sender_mail, receiver_mail)
                 User.otp = otp
-                
+                User.save()
+
                 message = {'message': "OTP sent to the email"}
                 return Response(message, status=status.HTTP_200_OK)
-        # else:
-        #     print(serializer.errors)
-        # return Response(status=status.HTTP_400_BAD_REQUEST)
+        else:
+            print(serializer.errors)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
 
 class OTP_Verification_view(APIView):
-    def post(self,request):
+    def post(self, request):
         email = request.data.get('email')
         otp = request.data.get('otp')
 
-        usr = user.objects.get(email = email)
-        print(usr.otp,otp,';;;;;;;;;;;;;')
+        usr = user.objects.get(email=email)
 
-        if usr.otp == otp:
+        if int(usr.otp) == int(otp):
             usr.is_verified = True
             usr.save()
             del usr.otp
-            return Response('user_verified successfully',status=status.HTTP_200_OK)
+            return Response('user_verified successfully', status=status.HTTP_200_OK)
         else:
             usr.delete()
-            return Response({'message':'You have entered the wrong otp try again'},status=status.HTTP_404_NOT_FOUND)
+            return Response({'message': 'You have entered the wrong otp try again'}, status=status.HTTP_404_NOT_FOUND)
+
 
 class UserLoginAPIView(TokenObtainPairView):
 
@@ -222,6 +224,3 @@ class LogoutApiView(APIView):
     def post(self, request):
         logout(request)
         return Response({'message': "successfully logged out."}, status=status.HTTP_200_OK)
-
-
-
