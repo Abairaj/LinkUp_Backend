@@ -53,3 +53,14 @@ class DeletePost_Action(APIView):
         reciever_mail = post.user.email
         send_email.delay(subject, message, sender_mail, reciever_mail)
         return Response(status=status.HTTP_304_NOT_MODIFIED)
+
+
+class SearchReportApiView(APIView):
+    def get(self,request):
+        key = request.GET.get('key')
+        print(key,'kkkkkkkkkkkkk')
+        reports = Report.objects.filter(reason__startswith=key)
+        serializer = CreateReportSerializer(reports,many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+
+    
