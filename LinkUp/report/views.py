@@ -11,32 +11,34 @@ from .task import send_email
 
 
 class ReportAPIVIEW(APIView):
-
     def get(self, request):
-        report = Report.objects.exclude(resolved=True).select_related(
-            'reporting_user').select_related('reported_user').all()
-        serializer = ReportSerializer(report, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        search_key = request.GET.get('key')
+        page = int(request.GET.get('page', 1))
+        per_page = 10
 
-    def post(self, request):
-        print(request.data)
-        serializer = CreateReportSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({"message": "Report created"}, status=status.HTTP_200_OK)
+        # Apply search filter if search_key is provided
+        if search_key:
+            report = Report.objects.filter(
+                Q(reporting_user__username__icontains=search_key) |
+                Q(reported_user__username__icontains=search_key)
+            ).exclude(resolved=True)
         else:
-            print(serializer.errors)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            report = Report.objects.exclude(resolved=True)
 
-    def patch(self, request):
-        report_id = request.data.get('report_id')
-        try:
-            report = Report.objects.get(id=report_id)
-        except Report.DoesNotExist:
-            return Response({'message': "report does not exist"}, status=status.HTTP_404_NOT_FOUND)
-        report.resolved = True
-        report.save()
-        return Response({'message': 'report resolved successfully'}, status=status.HTTP_200_OK)
+        total_reports = report.count()
+        offset = (page - 1) * per_page
+        limit = page * per_page
+
+        report = report.select_related(
+            'reporting_user', 'reported_user').all()[offset:limit]
+        serializer = ReportSerializer(report, many=True)
+
+        response_data = {
+            'results': serializer.data,
+            'total_pages': (total_reports + per_page - 1) // per_page
+        }
+
+        return Response(response_data, status=status.HTTP_200_OK)
 
 
 class DeletePost_Action(APIView):
@@ -56,11 +58,9 @@ class DeletePost_Action(APIView):
 
 
 class SearchReportApiView(APIView):
-    def get(self,request):
+    def get(self, request):
         key = request.GET.get('key')
-        print(key,'kkkkkkkkkkkkk')
+        print(key, 'kkkkkkkkkkkkk')
         reports = Report.objects.filter(reason__startswith=key)
-        serializer = CreateReportSerializer(reports,many=True)
-        return Response(serializer.data,status=status.HTTP_200_OK)
-
-    
+        serializer = CreateReportSerializer(reports, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
