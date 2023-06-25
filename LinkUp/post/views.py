@@ -14,6 +14,8 @@ from .serializers import PostSerializers, GETPostSerializers, LikeSerializer, Co
 from django.core.files.storage import default_storage
 from django.conf import settings
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
+
 
 
 def get_post_of_following(user_id):
@@ -22,7 +24,7 @@ def get_post_of_following(user_id):
     except user.DoesNotExist:
         return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    posts = Post.objects.filter(user__in=usr.following.all())
+    posts = Post.objects.filter(Q(user__in=usr.following.all()) | Q(user_id=usr.id))
     return posts
 
 

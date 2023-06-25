@@ -207,9 +207,10 @@ class UserSuggestionView(APIView):
 
     def get(self, request):
         try:
-            usr = user.objects.filter(is_superuser=False).all()
+            usr = user.objects.filter(is_superuser=False).exclude(email=request.user).all()
         except:
             print("no users")
+            usr = None
 
         if usr:
             serializer = UserProfileSerializer(instance=usr, many=True)
