@@ -7,35 +7,36 @@ from .models import Report
 from post.models import Post
 from datetime import datetime
 from django.core.mail import send_mail
+from django.core.paginator import Paginator
 from .task import send_email
+from django.db.models import Q
 
 
-class ReportAPIVIEW(APIView):
+class ReportAPIView(APIView):
     def get(self, request):
         search_key = request.GET.get('key')
         page = int(request.GET.get('page', 1))
-        per_page = 10
+        per_page = 3
 
         # Apply search filter if search_key is provided
         if search_key:
-            report = Report.objects.filter(
-                Q(reporting_user__username__icontains=search_key) |
-                Q(reported_user__username__icontains=search_key)
+            print('search key is there..........')
+            reports = Report.objects.filter(
+                reason__icontains=search_key
             ).exclude(resolved=True)
         else:
-            report = Report.objects.exclude(resolved=True)
+            reports = Report.objects.exclude(resolved=True)
 
-        total_reports = report.count()
-        offset = (page - 1) * per_page
-        limit = page * per_page
+        paginator = Paginator(reports, per_page)
 
-        report = report.select_related(
-            'reporting_user', 'reported_user').all()[offset:limit]
-        serializer = ReportSerializer(report, many=True)
+        paginated_reports = paginator.get_page(page)
+
+        serializer = ReportSerializer(paginated_reports, many=True)
+
 
         response_data = {
             'results': serializer.data,
-            'total_pages': (total_reports + per_page - 1) // per_page
+            'total_pages': paginator.num_pages
         }
 
         return Response(response_data, status=status.HTTP_200_OK)
@@ -55,12 +56,3 @@ class DeletePost_Action(APIView):
         reciever_mail = post.user.email
         send_email.delay(subject, message, sender_mail, reciever_mail)
         return Response(status=status.HTTP_304_NOT_MODIFIED)
-
-
-class SearchReportApiView(APIView):
-    def get(self, request):
-        key = request.GET.get('key')
-        print(key, 'kkkkkkkkkkkkk')
-        reports = Report.objects.filter(reason__startswith=key)
-        serializer = CreateReportSerializer(reports, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)

@@ -1,0 +1,31 @@
+version: "3"
+
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 7156
+      POSTGRES_DB: linkup
+    ports:
+      - "5439:5439"  # Map container port 5432 to host port 5439
+    networks:
+      - my-network
+
+  app:
+    build: .
+    image: linkup
+    ports:
+      - "9001:8000"
+    depends_on:
+      - db
+    restart: always
+    environment:
+      DB_URL: "host=db user=postgres password=7156 dbname=linkup port=5439 sslmode=disable TimeZone=Asia/Shanghai"
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    driver: bridge

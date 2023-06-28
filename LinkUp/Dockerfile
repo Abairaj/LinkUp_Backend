@@ -1,25 +1,20 @@
-# # Use an official Python runtime as a parent image
-# FROM python:3.9-buster
+FROM ubuntu:22.04
 
-# # Set environment variables
-# ENV PYTHONUNBUFFERED 1
-# ENV PYTHONDONTWRITEBYTECODE 1
+RUN apt-get update && apt-get install -y python3 python3-pip python3-venv
 
-# # Set the working directory in the container
-# WORKDIR /LinkUp
+RUN python3 -m venv /djvenv
+ENV PATH="/djvenv/bin:$PATH"
 
-# # Copy the requirements file to the working directory
-# COPY requirements.txt .
+WORKDIR /LinkUp
 
-# # Install the required packages
-# RUN pip install --no-cache-dir -r requirements.txt
+# Copy project files
+COPY . /LinkUp/
 
-# # Copy the project files to the working directory
-# COPY . .
+# Install dependencies
+RUN pip install -r /LinkUp/requirements.txt
 
-# # Expose the port on which the Django development server will run (default: 8000)
-# EXPOSE 8000
+# Expose ports
+EXPOSE 8000
 
-# # Run the Django development server
-# CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
-# # 
+RUN chmod +x /LinkUp/start.sh
+ENTRYPOINT ["/LinkUp/start.sh"]

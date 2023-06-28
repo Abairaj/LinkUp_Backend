@@ -15,7 +15,6 @@ class PostSerializer(serializers.ModelSerializer):
         model = Post
         fields = "__all__"
 
-
 class ReportSerializer(serializers.ModelSerializer):
     post = PostSerializer()
     reporting_user = UserSerializer()

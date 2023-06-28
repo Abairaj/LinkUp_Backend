@@ -113,7 +113,7 @@ DATABASES = {
         'USER': 'postgres',
         'PASSWORD': '7156',
         'HOST': 'localhost',
-        'PORT': '',
+        'PORT': '5432',
     }
 }
 
@@ -153,6 +153,8 @@ USE_TZ = True
 
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
 
 
 MEDIA_URL = '/media/'
@@ -280,24 +282,12 @@ SOCIALACCOUNT_PROVIDERS = {
 SOCIALACCOUNT_QUERY_EMAIL = True
 
 
-# # Celery configuration
-# CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//'  # RabbitMQ message broker URL
-# CELERY_RESULT_BACKEND = 'db+postgresql://postgres:7156@localhost:5432/linkup'  # Store Celery results in the Django database
-# CELERY_TIMEZONE = 'UTC'
-
 
 CELERY_BROKER_URL = 'amqp://localhost'
 CELERY_RESULT_BACKEND = 'rpc://'  # Store Celery results in the Django database
 
 
-# # Django Celery Beat scheduler configuration
-# CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
-# CELERY_BEAT_SCHEDULE = {
-#     'compress-media-every-5-minutes': {
-#         'task': 'posts.tasks.compress_media',
-#         'schedule': crontab(minute='*/5'),  # Schedule task to run every 5 minutes
-#     },
-# }
+
 
 
 CLOUDINARY_STORAGE = {
@@ -307,11 +297,7 @@ CLOUDINARY_STORAGE = {
 }
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
-# CHANNEL_LAYERS = {
-#     'default': {
-#         'BACKEND': 'channels.layers.InMemoryChannelLayer',
-#     },
-# }
+
 
 
 CHANNEL_LAYERS = {
