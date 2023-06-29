@@ -9,7 +9,7 @@ services:
       POSTGRES_PASSWORD: 7156
       POSTGRES_DB: linkup
     ports:
-      - "5439:5439"  # Map container port 5432 to host port 5439
+      - "5439:5432"  # Map container port 5432 to host port 5439
     networks:
       - my-network
 
