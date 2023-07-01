@@ -1,20 +1,30 @@
-FROM ubuntu:22.04
+FROM python:3.9
 
-RUN apt-get update && apt-get install -y python3 python3-pip python3-venv
+ENV PYTHONUNBUFFERED=1
 
-RUN python3 -m venv /djvenv
-ENV PATH="/djvenv/bin:$PATH"
+WORKDIR /code
 
-WORKDIR /LinkUp
+# Install system dependencies
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+    postgresql \
+    postgresql-contrib \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy project files
-COPY . /LinkUp/
+COPY . /code/
 
-# Install dependencies
-RUN pip install -r /LinkUp/requirements.txt
+# Set environment variables
+ENV DATABASE_NAME=linkup
+ENV DATABASE_USER=postgres
+ENV DATABASE_PASSWORD=7156
+ENV DATABASE_HOST=db
+ENV DATABASE_PORT=5432
 
-# Expose ports
-EXPOSE 8000
-
-RUN chmod +x /LinkUp/start.sh
-ENTRYPOINT ["/LinkUp/start.sh"]
+# Run migrations and start the Django server
+RUN chmod +x ./start.sh
+CMD ["./start.sh"]

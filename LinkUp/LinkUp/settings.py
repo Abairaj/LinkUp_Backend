@@ -169,9 +169,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # django rest framework
 
 REST_FRAMEWORK = {
-    # 'DEFAULT_FILTER_BACKENDS': [
-    #     'django_filters.rest_framework.DjangoFilterBackend',
-    # ],
+
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
@@ -233,10 +231,6 @@ SIMPLE_JWT = {
 
 CORS_ALLOW_ALL_ORIGINS = True
 
-# CORS_ORIGIN_WHITELIST = [
-#     'https://sociallinkup.netlify.app',
-# ]
-
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
@@ -262,8 +256,6 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 CORS_ALLOW_CREDENTIALS = True
-
-
 
 
 

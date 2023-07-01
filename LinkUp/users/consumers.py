@@ -94,9 +94,6 @@ class UserConsumer(AsyncWebsocketConsumer):
                     }
                 )
 
-
-            
-
             if event == 'call_user':
                 to = text_data_json.get('to')
                 frm = text_data_json.get('from')

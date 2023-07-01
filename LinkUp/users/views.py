@@ -82,11 +82,11 @@ class UserRegistrationAPIView(APIView):
 class OTP_Verification_view(APIView):
     def post(self, request):
         email = request.data.get('email')
-        otp = request.data.get('otp')
+        otp = int(request.data.get('otp'))
 
         usr = user.objects.get(email=email)
 
-        if int(usr.otp) == int(otp):
+        if usr.otp == int(otp):
             usr.is_verified = True
             usr.save()
             del usr.otp
@@ -207,7 +207,8 @@ class UserSuggestionView(APIView):
 
     def get(self, request):
         try:
-            usr = user.objects.filter(is_superuser=False).exclude(email=request.user).all()
+            usr = user.objects.filter(is_superuser=False).exclude(
+                email=request.user).all()
         except:
             print("no users")
             usr = None
